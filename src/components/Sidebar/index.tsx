@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "../ClickOutside";
 import SidebarItem from "./SidebarItem";
-import useLocalStorage from "@/app/hooks/useLocalStorage";
+import useLocalStorage from "@/hooks/useLocalStorage";
 // import SidebarItem from "@/components/Sidebar/SidebarItem";
 // import ClickOutside from "@/components/ClickOutside";
 // import useLocalStorage from "@/hooks/useLocalStorage";
