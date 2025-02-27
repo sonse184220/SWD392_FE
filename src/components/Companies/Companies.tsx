@@ -9,32 +9,15 @@ interface Data {
 }
 
 const data: Data[] = [
-    {
-        imgSrc: "/assets/carousel/google.svg"
-    },
-    {
-        imgSrc: "/assets/carousel/garnier.png"
-    },
-    {
-        imgSrc: "/assets/carousel/slack.png"
-    },
-    {
-        imgSrc: "/assets/carousel/udemy.png"
-    },
-    {
-        imgSrc: "/assets/carousel/google.svg"
-    },
-    {
-        imgSrc: "/assets/carousel/garnier.png"
-    },
-    {
-        imgSrc: "/assets/carousel/slack.png"
-    },
-    {
-        imgSrc: "/assets/carousel/udemy.png"
-    }
-]
-
+    { imgSrc: "/banahill.webp" },
+    { imgSrc: "/nguhanhson.webp" },
+    { imgSrc: "/phocohoian.webp" },
+    { imgSrc: "/freshgarden.webp" },
+    { imgSrc: "/nuilangbiang.webp" },
+    { imgSrc: "/thacdatanla.webp" },
+    { imgSrc: "/vinhhalong.webp" },
+    { imgSrc: "/baichay.webp" }
+];
 
 // CAROUSEL SETTINGS
 export default class MultipleItems extends Component {
@@ -53,7 +36,7 @@ export default class MultipleItems extends Component {
                 {
                     breakpoint: 1024,
                     settings: {
-                        slidesToShow: 4,
+                        slidesToShow: 3,
                         slidesToScroll: 1,
                         infinite: true,
                         dots: false
@@ -81,22 +64,28 @@ export default class MultipleItems extends Component {
         };
 
         return (
-
-            <div className='text-center'>
-                <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+            <div className="text-center">
+                <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
                     <div className="py-14">
                         <Slider {...settings}>
-                            {data.map((item, i) =>
-                                <div key={i}>
-                                    <Image src={item.imgSrc} alt={item.imgSrc} width={150} height={150} />
+                            {data.map((item, i) => (
+                                <div key={i} className="px-2">
+                                    <div className="w-[180px] mx-auto relative rounded-lg overflow-hidden shadow-lg">
+                                        <Image
+                                            src={item.imgSrc}
+                                            alt={`Image ${i + 1}`}
+                                            width={180}
+                                            height={200}
+                                            className="rounded-lg object-cover"
+                                        />
+                                    </div>
                                 </div>
-                            )}
+                            ))}
                         </Slider>
                     </div>
                     <hr />
                 </div>
             </div>
-
-        )
+        );
     }
 }
