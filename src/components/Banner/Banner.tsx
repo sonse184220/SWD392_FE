@@ -13,7 +13,7 @@ const Banner = () => {
                                 src={'/travel4K.jpg'}
                                 alt="banner-image"
                                 fill
-                                // style={{ objectFit: "cover" }}
+                                style={{ objectFit: "cover" }}
                                 className="opacity-80"
                             />
                         </div>
