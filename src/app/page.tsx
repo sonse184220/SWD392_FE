@@ -104,7 +104,7 @@ import Provide from "@/components/Provide";
 import Why from "@/components/Why";
 import Network from "@/components/Network";
 import Clientsay from "@/components/Clientsay";
-import Newsletter from "@/components/Newsletter/Newsletter";
+// import Newsletter from "@/components/Newsletter/Newsletter";
 
 export const metadata: Metadata = {
   title:
@@ -125,7 +125,7 @@ export default function Home() {
       <Why />
       <Network />
       <Clientsay />
-      <Newsletter />
+      {/* <Newsletter /> */}
     </main>
   );
 }
