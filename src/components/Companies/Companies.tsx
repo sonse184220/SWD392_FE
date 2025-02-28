@@ -9,14 +9,14 @@ interface Data {
 }
 
 const data: Data[] = [
-    { imgSrc: "/banahill.webp" },
-    { imgSrc: "/nguhanhson.webp" },
-    { imgSrc: "/phocohoian.webp" },
-    { imgSrc: "/freshgarden.webp" },
-    { imgSrc: "/nuilangbiang.webp" },
-    { imgSrc: "/thacdatanla.webp" },
-    { imgSrc: "/vinhhalong.webp" },
-    { imgSrc: "/baichay.webp" }
+    { imgSrc: "/danang/banahill.webp" },
+    { imgSrc: "/danang/nguhanhson.webp" },
+    { imgSrc: "/danang/phocohoian.webp" },
+    { imgSrc: "/danang/freshgarden.webp" },
+    { imgSrc: "/dalat/nuilangbiang.webp" },
+    { imgSrc: "/dalat/thacdatanla.webp" },
+    { imgSrc: "/quangninh/vinhhalong.webp" },
+    { imgSrc: "/quangninh/baichay.webp" }
 ];
 
 // CAROUSEL SETTINGS
@@ -70,13 +70,13 @@ export default class MultipleItems extends Component {
                         <Slider {...settings}>
                             {data.map((item, i) => (
                                 <div key={i} className="px-2">
-                                    <div className="w-[180px] mx-auto relative rounded-lg overflow-hidden shadow-lg">
+                                    <div className="w-[250px] h-[180px] mx-auto relative rounded-lg overflow-hidden shadow-lg">
                                         <Image
                                             src={item.imgSrc}
                                             alt={`Image ${i + 1}`}
                                             width={180}
                                             height={200}
-                                            className="rounded-lg object-cover"
+                                            className="rounded-lg object-cover w-full h-full"
                                         />
                                     </div>
                                 </div>
