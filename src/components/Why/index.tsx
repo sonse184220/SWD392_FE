@@ -42,7 +42,7 @@ const Why = () => {
                         <div className="mt-10">
                         {whydata.map((items, i) => (
                             <div className="flex mt-4 items-start" key={i}>
-                                <span className="text-xl text-blue-500 mr-3">●</span> {/* Thêm dấu chấm */}
+                                <span className="text-xl text-blue-500 mr-3">●</span>
                                 <div>
                                     <h4 className="text-2xl font-semibold">{items.heading}</h4>
                                     <h5 className="text-lg text-beach font-normal mt-2">{items.subheading}</h5>

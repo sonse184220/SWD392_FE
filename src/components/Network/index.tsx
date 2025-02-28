@@ -1,61 +1,69 @@
 import Image from "next/image";
 
-interface datatype {
+interface DataType {
     imgSrc: string;
-    country: string;
-    paragraph: string;
+    city: string;
+    description: string;
 }
 
-const Aboutdata: datatype[] = [
+const CityData: DataType[] = [
     {
-        imgSrc: "/assets/network/bangladesh.svg",
-        country: "Bangladesh",
-        paragraph: 'Event madness gathering innoies, & tech enthusiasts in Speced.',
-
+        imgSrc: "danang.svg",
+        city: "Da Nang",
+        description: "The most livable city in Vietnam, famous for My Khe Beach, Dragon Bridge, and Ba Na Hills.",
     },
     {
-        imgSrc: "/assets/network/america.svg",
-        country: "United States",
-        paragraph: 'Event madness gathering innoies, & tech enthusiasts in Speced.',
-
+        imgSrc: "dalat.svg",
+        city: "Da Lat",
+        description: "The city of a thousand flowers with a cool climate all year round, featuring Xuan Huong Lake and the Valley of Love.",
     },
     {
-        imgSrc: "/assets/network/australia.svg",
-        country: "Australia",
-        paragraph: 'Event madness gathering innoies, & tech enthusiasts in Speced.',
-
+        imgSrc: "quangninh.svg",
+        city: "Quang Ninh",
+        description: "Home to Ha Long Bay – a world natural wonder, along with many stunning landscapes.",
     },
-    {
-        imgSrc: "/assets/network/china.svg",
-        country: "China",
-        paragraph: 'Event madness gathering innoies, & tech enthusiasts in Speced.',
-
-    },
-]
+];
 
 const Network = () => {
     return (
-        <div className="bg-babyblue" id="project">
-            <div className="mx-auto max-w-2xl py-20 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                <h3 className="text-4xl sm:text-6xl font-semibold text-center my-10 lh-81">Our network & world <br /> work details.</h3>
+        <div className="relative bg-babyblue" id="project">
+            {/* Background Image */}
+            <Image 
+                src={'/WallpaperDog-20454369.jpg'} 
+                alt={"Vietnam Map"} 
+                width={1800} 
+                height={1000} 
+                className="absolute top-0 left-0 w-full h-full object-cover opacity-80"
+            />
 
-                <Image src={'/assets/network/map.png'} alt={"map-image"} width={1400} height={800} />
+            {/* Content */}
+            <div className="relative mx-auto max-w-2xl py-20 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+                <h3 className="text-4xl sm:text-6xl font-semibold text-white text-center my-10 lh-81">
+                    Explore the Beauty of Vietnam 🌍
+                </h3>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-16 gap-y-4 lg:gap-x-8'>
-                    {Aboutdata.map((item, i) => (
-                        <div key={i} className='bg-white rounded-2xl p-5 shadow-xl'>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-16 gap-y-4 lg:gap-x-8">
+                    {CityData.map((item, i) => (
+                        <div key={i} className="bg-white rounded-2xl p-5 shadow-xl">
                             <div className="flex justify-start items-center gap-2">
-                                <Image src={item.imgSrc} alt={item.imgSrc} width={55} height={55} className="mb-2" />
-                                <h4 className="text-xl font-medium text-midnightblue">{item.country}</h4>
+                                <Image 
+                                    src={"/reddestination.jpg"} 
+                                    alt={item.city} 
+                                    width={55} 
+                                    height={55} 
+                                    className="mb-2"
+                                />
+                                <h4 className="text-xl font-medium text-midnightblue">{item.city}</h4>
                             </div>
                             <hr />
-                            <h4 className='text-lg font-normal text-bluegrey my-2'>{item.paragraph}</h4>
+                            <h4 className="text-lg font-normal my-2">{item.description}</h4>
                         </div>
                     ))}
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
+
 
 export default Network;
