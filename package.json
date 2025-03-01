@@ -11,6 +11,8 @@
   "dependencies": {
     "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.18",
+    "@subframe/core": "^1.137.0",
+    "ai": "^4.1.45",
     "apexcharts": "^4.4.0",
     "firebase": "^11.3.1",
     "flatpickr": "^4.6.13",
