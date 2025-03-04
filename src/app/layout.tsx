@@ -41,6 +41,7 @@ import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
 import Navbar from "@/components/Navbar/index";
 import Footer from "@/components/Footer/Footer";
+import { listenForNotifications } from "@/services/notificationService";
 
 export default function RootLayout({
   children,
@@ -54,6 +55,11 @@ export default function RootLayout({
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000);
+  }, []);
+
+  useEffect(() => {
+    // requestNotificationPermission();
+    listenForNotifications();
   }, []);
 
   return (
