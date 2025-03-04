@@ -127,7 +127,7 @@ export default function Home() {
       <Why />
       <Network />
       <Clientsay />
-      <Newsletter />
+      {/* <Newsletter /> */}
     </main>
   );
 }
