@@ -3,11 +3,12 @@ import { Fragment, useState } from 'react'
 import { LockClosedIcon } from '@heroicons/react/20/solid'
 import { auth, provider, signInWithPopup, signOut } from "../../../firebaseAuth";
 import { User } from "firebase/auth";
+import { FaGoogle } from 'react-icons/fa';
+import { login } from '@/services/authService';
 
 
 const Signin = () => {
     let [isOpen, setIsOpen] = useState(false)
-    const [user, setUser] = useState<User | null>(null);
 
     const closeModal = () => {
         setIsOpen(false)
@@ -19,9 +20,18 @@ const Signin = () => {
 
     const handleSignIn = async () => {
         try {
+            console.log("called")
             const result = await signInWithPopup(auth, provider);
-            setUser(result.user);
-            console.log(result.user.getIdToken());
+            console.log("called 2")
+            const firebaseToken = await result.user.getIdToken();
+            console.log(firebaseToken);
+            const response = await login(firebaseToken);
+            console.log("response", response);
+            if (response.status === 200) {
+                sessionStorage.setItem("token", response.data.accessToken)
+                window.dispatchEvent(new Event("sessionUpdate"));
+                setIsOpen(false)
+            }
         } catch (error) {
             console.error("Login Failed", error);
         }
@@ -31,7 +41,10 @@ const Signin = () => {
         <>
             <div className="absolute inset-y-0 right-0 flex items-center sm:static sm:inset-auto sm:pr-0">
                 <div className='hidden lg:block'>
-                    <button type="button" className='text-lg text-blue font-medium' onClick={openModal}>
+                    <button type="button"
+                        // className='text-lg text-blue font-medium' 
+                        className="text-blue text-lg font-medium ml-9 py-5 px-16 transition duration-150 ease-in-out leafbutton bg-lightblue hover:text-white hover:bg-blue"
+                        onClick={openModal}>
                         Sign In
                     </button>
                 </div>
@@ -76,7 +89,7 @@ const Signin = () => {
                                                     Sign in to your account
                                                 </h2>
                                             </div>
-                                            <form className="mt-8 space-y-6" action="#" method="POST">
+                                            {/* <form className="mt-8 space-y-6" action="#" method="POST">
                                                 <input type="hidden" name="remember" defaultValue="true" />
                                                 <div className="-space-y-px rounded-md shadow-sm">
                                                     <div>
@@ -141,8 +154,22 @@ const Signin = () => {
                                                         Sign in
                                                     </button>
                                                 </div>
-                                            </form>
+                                            </form> */}
                                         </div>
+                                    </div>
+
+                                    <div>
+                                        <button
+                                            // type="submit"
+                                            onClick={handleSignIn}
+                                            className="group relative flex w-full justify-center rounded-md border border-transparent bg-blue py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                        >
+                                            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                                {/* <LockClosedIcon className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" aria-hidden="true" /> */}
+                                                <FaGoogle className="h-5 w-5 text-white-500" />
+                                            </span>
+                                            Sign in with Google Account
+                                        </button>
                                     </div>
 
 
