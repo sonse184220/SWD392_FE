@@ -3,7 +3,11 @@ import { listenForNotifications, requestNotificationPermission } from '@/service
 import Navbar from './Navbar';
 import React, { useEffect } from 'react';
 
-const Navbarin: React.FC = () => {
+type NavbarProps = {
+    isLogin: boolean;
+};
+
+const Navbarin: React.FC<NavbarProps> = ({ isLogin }) => {
     useEffect(() => {
         requestNotificationPermission();
         // listenForNotifications();
@@ -41,7 +45,7 @@ const Navbarin: React.FC = () => {
     }, [])
     return (
         <>
-            <Navbar />
+            <Navbar isLogin={isLogin} />
         </>
     );
 }

@@ -6,7 +6,14 @@ import Drawer from "./Drawer";
 import Drawerdata from "./Drawerdata";
 import Signdialog from "./Signdialog";
 import Registerdialog from "./Registerdialog";
+import { Menu, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import { Fragment } from 'react';
 
+
+interface Props {
+    isLogin: boolean;
+};
 
 interface NavigationItem {
     name: string;
@@ -26,9 +33,18 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-const Navbar = () => {
+const Navbar: React.FC<Props> = ({ isLogin }) => {
 
     const [isOpen, setIsOpen] = React.useState(false);
+
+    const handleSignOut = async () => {
+        try {
+            sessionStorage.removeItem("token")
+            window.dispatchEvent(new Event("sessionUpdate"));
+        } catch (error) {
+            console.error("Login Failed", error);
+        }
+    };
 
     return (
         <Disclosure as="nav" className="navbar">
@@ -78,12 +94,93 @@ const Navbar = () => {
 
                         {/* SIGNIN DIALOG */}
 
-                        <Signdialog />
+
+
+                        {isLogin ?
+                            (
+                                <Menu as="div" className="relative inline-block text-left">
+                                    <div>
+                                        {/* <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50">
+                                        Options
+                                        <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-gray-400" />
+                                    </Menu.Button> */}
+                                        <Menu.Button>
+                                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-300">
+                                                <img className='w-full h-full object-cover' src="/image.png" alt="" />
+                                            </div>
+                                        </Menu.Button>
+                                    </div>
+
+                                    <Transition
+                                        as={Fragment}
+                                        enter="transition ease-out duration-100"
+                                        enterFrom="transform opacity-0 scale-95"
+                                        enterTo="transform opacity-100 scale-100"
+                                        leave="transition ease-in duration-75"
+                                        leaveFrom="transform opacity-100 scale-100"
+                                        leaveTo="transform opacity-0 scale-95"
+                                    >
+                                        <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+                                            <div className="py-1">
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            href="#"
+                                                            className={`block px-4 py-2 text-sm text-gray-700 ${active ? 'bg-gray-100 text-gray-900' : ''}`}
+                                                        >
+                                                            Account settings
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            href="#"
+                                                            className={`block px-4 py-2 text-sm text-gray-700 ${active ? 'bg-gray-100 text-gray-900' : ''}`}
+                                                        >
+                                                            Support
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            href="#"
+                                                            className={`block px-4 py-2 text-sm text-gray-700 ${active ? 'bg-gray-100 text-gray-900' : ''}`}
+                                                        >
+                                                            License
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                                <form action="#" method="POST">
+                                                    <Menu.Item>
+                                                        {({ active }) => (
+                                                            <button
+                                                                type="submit"
+                                                                onClick={handleSignOut}
+                                                                className={`block w-full px-4 py-2 text-left text-sm text-gray-700 ${active ? 'bg-gray-100 text-gray-900' : ''
+                                                                    }`}
+                                                            >
+                                                                Sign out
+                                                            </button>
+                                                        )}
+                                                    </Menu.Item>
+                                                </form>
+                                            </div>
+                                        </Menu.Items>
+                                    </Transition>
+                                </Menu>
+                            )
+                            :
+                            (
+                                <Signdialog />
+                            )
+                        }
 
 
                         {/* REGISTER DIALOG */}
 
-                        <Registerdialog />
+                        {/* <Registerdialog /> */}
 
 
                         {/* DRAWER FOR MOBILE VIEW */}
