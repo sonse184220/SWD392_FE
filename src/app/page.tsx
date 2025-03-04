@@ -104,7 +104,9 @@ import Provide from "@/components/Provide";
 import Why from "@/components/Why";
 import Network from "@/components/Network";
 import Clientsay from "@/components/Clientsay";
-// import Newsletter from "@/components/Newsletter/Newsletter";
+import Newsletter from "@/components/Newsletter/Newsletter";
+import { requestNotificationPermission, listenForNotifications } from "../services/notificationService";
+
 
 export const metadata: Metadata = {
   title:

@@ -1,7 +1,7 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useState } from 'react'
 import { LockClosedIcon } from '@heroicons/react/20/solid'
-import { auth, provider, signInWithPopup, signOut } from "../../../firebaseConfig";
+import { auth, provider, signInWithPopup, signOut } from "../../../firebaseAuth";
 import { User } from "firebase/auth";
 
 
