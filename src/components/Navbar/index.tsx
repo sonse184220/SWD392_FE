@@ -1,8 +1,17 @@
 "use client"
+import { listenForNotifications, requestNotificationPermission } from '@/services/notificationService';
 import Navbar from './Navbar';
 import React, { useEffect } from 'react';
 
-const Navbarin: React.FC = () => {
+type NavbarProps = {
+    isLogin: boolean;
+};
+
+const Navbarin: React.FC<NavbarProps> = ({ isLogin }) => {
+    useEffect(() => {
+        requestNotificationPermission();
+        // listenForNotifications();
+    }, []);
     useEffect(() => {
         // The debounce function receives our function as a parameter
         const debounce = (fn: Function) => {
@@ -36,7 +45,7 @@ const Navbarin: React.FC = () => {
     }, [])
     return (
         <>
-            <Navbar />
+            <Navbar isLogin={isLogin} />
         </>
     );
 }
