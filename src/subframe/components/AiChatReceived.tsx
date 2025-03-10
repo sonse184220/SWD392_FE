@@ -1,28 +1,34 @@
 "use client";
-/*
- * Documentation:
- * AI Chat Received — https://app.subframe.com/ec98ea52812e/library?component=AI+Chat+Received_f3f2b42c-0949-4269-9ba9-0f247778a839
- * Icon with background — https://app.subframe.com/ec98ea52812e/library?component=Icon+with+background_c5d68c0e-4c0c-4cff-8d8c-6ff334859b3a
- * AI Chat Toolbar — https://app.subframe.com/ec98ea52812e/library?component=AI+Chat+Toolbar_e3cd651a-0a0f-441e-8ea8-b0fe066515e7
- */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as SubframeCore from "@subframe/core";
 import { IconWithBackground } from "./IconWithBackground";
 import { AiChatToolbar } from "./AiChatToolbar";
+import { getRecommendation } from "../../services/AI/recommendMessageService";
 
 interface AiChatReceivedRootProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode;
   className?: string;
 }
 
 const AiChatReceivedRoot = React.forwardRef<
   HTMLElement,
   AiChatReceivedRootProps
->(function AiChatReceivedRoot(
-  { children, className, ...otherProps }: AiChatReceivedRootProps,
-  ref
-) {
+>(function AiChatReceivedRoot({ className, ...otherProps }, ref) {
+  const [message, setMessage] = useState<string>("Đang tải...");
+
+  useEffect(() => {
+    async function fetchRecommendation() {
+      try {
+        const response = await getRecommendation();
+        setMessage(response.data.message); // Giả sử API trả về { message: "Nội dung AI phản hồi" }
+      } catch (error) {
+        setMessage("Lỗi khi nhận phản hồi từ AI.");
+      }
+    }
+
+    fetchRecommendation();
+  }, []);
+
   return (
     <div
       className={SubframeCore.twClassNames(
@@ -34,11 +40,9 @@ const AiChatReceivedRoot = React.forwardRef<
     >
       <IconWithBackground size="medium" icon="FeatherSparkle" />
       <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">
-        {children ? (
-          <div className="flex w-full flex-col items-start pt-1.5">
-            {children}
-          </div>
-        ) : null}
+        <div className="flex w-full flex-col items-start pt-1.5">
+          <p className="text-body font-body text-default-font">{message}</p>
+        </div>
         <AiChatToolbar />
       </div>
     </div>

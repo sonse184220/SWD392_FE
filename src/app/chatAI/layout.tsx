@@ -1,6 +1,6 @@
 import "./global.css";
 import type { Metadata } from "next";
-import Script from 'next/script';
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Subframe Next.js Starter",
@@ -15,9 +15,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-
+        {/* Thêm các meta tags hoặc script nếu cần */}
       </head>
-      <body>{children}</body>
+      <body className="flex flex-col min-h-screen">
+        {children}
+      </body>
     </html>
   );
 }

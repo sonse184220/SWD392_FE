@@ -104,7 +104,7 @@ export default function CityPage() {
           >
             <option value="daNang">Da Nang</option>
             <option value="daLat">Da Lat</option>
-            <option value="quangNinh">Quang Ninh</option> {/* Sửa từ bacNinh thành quangNinh */}
+            <option value="quangNinh">Quang Ninh</option>
           </select>
         </div>
 
@@ -120,8 +120,10 @@ export default function CityPage() {
       </div>
 
       <div className="min-h-screen bg-gray-100">
-        <div className="max-w-[1500px] w-full h-[500px] mx-auto mt-10 border border-gray-300 rounded-lg shadow-lg p-8 bg-white">
-          <AiChat />
+        <div className="max-w-[1500px] w-full mx-auto mt-10 border border-gray-300 rounded-lg shadow-lg p-8 bg-white">
+          <div className="overflow-y-auto chat-container">
+            <AiChat />
+          </div>
         </div>
 
         {/* Similar places section */}
@@ -142,7 +144,7 @@ export default function CityPage() {
                     layout="fill"
                     objectFit="cover"
                     className="rounded-t-lg"
-                    onError={(e) => console.log(`Image failed to load: ${place.image}`)} // Thêm để debug
+                    onError={(e) => console.log(`Image failed to load: ${place.image}`)}
                   />
                 </div>
                 <div className="p-4">
