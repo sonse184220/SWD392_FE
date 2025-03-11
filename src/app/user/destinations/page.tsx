@@ -1,6 +1,5 @@
 "use client";
-import BlogData from "@/components/Blog/blogData";
-import BlogItem from "@/components/Blog/BlogItem";
+import DestinationItem from "@/components/Destination/DestinationItem";
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Button, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
@@ -9,11 +8,8 @@ import { getCityList } from "@/services/cityService";
 import { getDistrictList } from "@/services/districtService";
 import { getCategoryList } from "@/services/categoryService";
 import { getSubCategoryList } from "@/services/subCategoryService";
-
-interface LocationOption {
-    label: string;
-    value: string;
-}
+import { getRecommendation } from "@/services/AI/geminiAIService";
+import { Destination } from "@/types/destination";
 
 interface City {
     cityId: number;
@@ -53,6 +49,8 @@ const BlogPage = () => {
     const [filteredSubCategories, setFilteredSubCategories] = React.useState<SubCategory[]>([]);
     const [selectedCategories, setSelectedCategories] = React.useState<number[]>([]); // Store category IDs
     const [selectedSubCategories, setSelectedSubCategories] = React.useState<number[]>([]); // Store subcategory IDs
+
+    const [destinationList, setDestinationList] = React.useState<Destination[]>([]);
 
 
     useEffect(() => {
@@ -131,16 +129,41 @@ const BlogPage = () => {
         );
     };
 
-    // const handleSearch = () => {
-    //     const searchData = {
-    //         selectedCity,
-    //         selectedDistricts,
-    //         selectedCategories,
-    //         selectedSubCategories,
-    //     };
-    //     console.log("Search Data:", searchData);
-    //     // TODO: Implement API call to fetch destinations based on selected filters
-    // };
+    const handleSearch = async () => {
+        let promptParts: string[] = ["Recommend places"];
+
+        if (selectedCity) {
+            promptParts.push(`in ${selectedCity.name}`);
+        }
+
+        if (selectedDistrict) {
+            promptParts.push(`at ${selectedDistrict.name}`);
+        }
+
+        if (selectedCategories.length > 0) {
+            const categoryNames = categories
+                .filter(cat => selectedCategories.includes(cat.categoryId))
+                .map(cat => cat.name)
+                .join(", ");
+            promptParts.push(`about categories: ${categoryNames}`);
+        }
+
+        if (selectedSubCategories.length > 0) {
+            const subCategoryNames = subCategories
+                .filter(sub => selectedSubCategories.includes(sub.subCategoryId))
+                .map(sub => sub.name)
+                .join(", ");
+            promptParts.push(`covering subcategories: ${subCategoryNames}`);
+        }
+
+        const searchData = promptParts.join(" ") + "."; // Final prompt
+        console.log("Search Data:", searchData);
+
+        const response = await getRecommendation(searchData);
+        if (response.status === 200) {
+            setDestinationList(response.data); // Update the list with fetched destinations
+        }
+    };
 
 
 
@@ -241,15 +264,19 @@ const BlogPage = () => {
                                     ))}
                                 </FormGroup>
                             </div>
+
+                            {/* Search Button */}
+                            <Button variant="contained" color="primary" fullWidth onClick={handleSearch} disabled={!selectedCity}>
+                                Search
+                            </Button>
                         </div>
                     </aside>
 
-                    {/* Blog Grid */}
-                    {/* <section className="lg:col-span-3"> */}
+                    {/* Destination Grid */}
                     <section className="lg:w-3/4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {BlogData.map((post, key) => (
-                                <BlogItem key={key} blog={post} />
+                            {destinationList.map((place, key) => (
+                                <DestinationItem key={key} destination={place} />
                             ))}
                         </div>
                     </section>
