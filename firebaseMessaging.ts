@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getMessaging, getToken, onMessage, Messaging } from "firebase/messaging";
 
 const firebaseMessagingConfig = {
     apiKey: "AIzaSyBFgghl1sPBNEUrRmOh-A0Ek1P_F_rs-LE",
@@ -11,21 +11,26 @@ const firebaseMessagingConfig = {
     measurementId: "G-03MN2GJFH3"
 };
 
-// Khởi tạo Firebase App cho Notifications
-const messagingApp = initializeApp(firebaseMessagingConfig, "messagingApp");
-const messaging = getMessaging(messagingApp);
+let messaging: Messaging | null = null;
 
-// Đăng ký service worker từ `/firebase-messaging-sw.js`
-if (typeof window !== "undefined" && "serviceWorker" in navigator) {
-    navigator.serviceWorker
-        .register("/firebase-messaging-sw.js")
-        .then((registration) => {
-            console.log("✅ Service Worker đăng ký thành công:", registration);
-        })
-        .catch((error) => {
-            console.error("❌ Lỗi đăng ký Service Worker:", error);
-        });
+
+if (typeof window !== "undefined") {
+
+    // Khởi tạo Firebase App cho Notifications
+    const messagingApp = initializeApp(firebaseMessagingConfig, "messagingApp");
+    messaging = getMessaging(messagingApp);
+
+    // Đăng ký service worker từ `/firebase-messaging-sw.js`
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+        navigator.serviceWorker
+            .register("/firebase-messaging-sw.js")
+            .then((registration) => {
+                console.log("✅ Service Worker đăng ký thành công:", registration);
+            })
+            .catch((error) => {
+                console.error("❌ Lỗi đăng ký Service Worker:", error);
+            });
+    }
 }
-
 
 export { messaging, getToken, onMessage };
