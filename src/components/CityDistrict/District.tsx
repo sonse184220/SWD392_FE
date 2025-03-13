@@ -61,22 +61,32 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { getDistrictList } from "@/services/districtService";
+import { addDistrict, deleteDistrict, getDistrictList, updateDistrict } from "@/services/districtService";
 
 interface District {
-    districtId: number;
+    districtId?: string;
     name: string;
+    address: string;
     description: string;
-    cityId: number;
+    rate: number;
+    categoryId: string;
+    ward: string;
+    status: string;
 }
 
 const District = () => {
     const [districts, setDistricts] = useState<District[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [currentDistrict, setCurrentDistrict] = useState<District | null>(null);
+
+    // State cho form
     const [name, setName] = useState("");
+    const [address, setAddress] = useState("");
     const [description, setDescription] = useState("");
-    const [cityId, setCityId] = useState(0);
+    const [rate, setRate] = useState(0);
+    const [categoryId, setCategoryId] = useState("");
+    const [ward, setWard] = useState("");
+    const [status, setStatus] = useState("");
 
     useEffect(() => {
         fetchDistricts();
@@ -95,26 +105,42 @@ const District = () => {
         if (district) {
             setCurrentDistrict(district);
             setName(district.name);
+            setAddress(district.address);
             setDescription(district.description);
-            setCityId(district.cityId);
+            setRate(district.rate);
+            setCategoryId(district.categoryId);
+            setWard(district.ward);
+            setStatus(district.status);
         } else {
             setCurrentDistrict(null);
             setName("");
+            setAddress("");
             setDescription("");
-            setCityId(0);
+            setRate(0);
+            setCategoryId("");
+            setWard("");
+            setStatus("");
         }
         setIsOpen(true);
     };
 
     const handleSave = async () => {
-        const method = currentDistrict ? "PUT" : "POST";
-        const endpoint = currentDistrict ? `/api/districts/${currentDistrict.districtId}` : "/api/districts";
+        const districtData: District = {
+            name,
+            address,
+            description,
+            rate,
+            categoryId,
+            ward,
+            status,
+        };
+
         try {
-            await fetch(endpoint, {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, description, cityId }),
-            });
+            if (currentDistrict?.districtId) {
+                await updateDistrict(currentDistrict.districtId, districtData);
+            } else {
+                await addDistrict(districtData);
+            }
             fetchDistricts();
             setIsOpen(false);
         } catch (error) {
@@ -122,9 +148,9 @@ const District = () => {
         }
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         try {
-            await fetch(`/api/districts/${id}`, { method: "DELETE" });
+            await deleteDistrict(id);
             fetchDistricts();
         } catch (error) {
             console.error("Error deleting district:", error);
@@ -143,23 +169,27 @@ const District = () => {
                     <TableRow className="bg-gray-200 dark:bg-gray-700">
                         <TableHead className="border px-4 py-2">ID</TableHead>
                         <TableHead className="border px-4 py-2">Name</TableHead>
-                        <TableHead className="border px-4 py-2">Description</TableHead>
-                        <TableHead className="border px-4 py-2">City ID</TableHead>
-                        <TableHead className="border px-4 py-2">Actions</TableHead>
+                        <TableHead className="border px-4 py-2">Address</TableHead>
+                        {/* <TableHead className="border px-4 py-2">Rate</TableHead> */}
+                        {/* <TableHead className="border px-4 py-2">Ward</TableHead> */}
+                        {/* <TableHead className="border px-4 py-2">Status</TableHead>
+                        <TableHead className="border px-4 py-2">Actions</TableHead> */}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {districts.map((district) => (
                         <TableRow key={district.districtId}>
                             <TableCell className="border px-4 py-2">{district.districtId}</TableCell>
-                            <TableCell className="border px-4 py-2">{district.name}</TableCell>
-                            <TableCell className="border px-4 py-2">{district.description}</TableCell>
-                            <TableCell className="border px-4 py-2">{district.cityId}</TableCell>
+                            <TableCell className="border px-4 py-2">{district.name}</TableCell> {/* Cập nhật từ district.destinationName thành district.name */}
+                            <TableCell className="border px-4 py-2">{district.description}</TableCell> {/* Cập nhật từ district.address thành district.description */}
+                            {/* <TableCell className="border px-4 py-2">{district.rate}</TableCell> 
+                            <TableCell className="border px-4 py-2">{district.ward}</TableCell> 
+                            <TableCell className="border px-4 py-2">{district.status}</TableCell>  */}
                             <TableCell className="border px-4 py-2">
                                 <Button variant="outline" onClick={() => openDialog(district)} className="mr-2">
                                     Edit
                                 </Button>
-                                <Button variant="destructive" onClick={() => handleDelete(district.districtId)}>
+                                <Button variant="destructive" onClick={() => handleDelete(district.districtId!)}> {/* Cập nhật từ district.districtId */}
                                     Delete
                                 </Button>
                             </TableCell>
@@ -173,22 +203,23 @@ const District = () => {
                     <DialogHeader>
                         <DialogTitle>{currentDistrict ? "Edit District" : "Add District"}</DialogTitle>
                     </DialogHeader>
-                    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter district name"
-                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-                    />
+                    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter name"
+                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" />
+                    <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter address"
+                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" />
                     <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Enter description"
-                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-                    />
-                    <Input type="number" value={cityId} onChange={(e) => setCityId(Number(e.target.value))} placeholder="Enter City ID"
-                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-                    />
+                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" />
+                    <Input type="number" value={rate} onChange={(e) => setRate(Number(e.target.value))} placeholder="Enter rate"
+                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" />
+                    <Input value={categoryId} onChange={(e) => setCategoryId(e.target.value)} placeholder="Enter category ID"
+                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" />
+                    <Input value={ward} onChange={(e) => setWard(e.target.value)} placeholder="Enter ward"
+                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" />
+                    <Input value={status} onChange={(e) => setStatus(e.target.value)} placeholder="Enter status"
+                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" />
                     <DialogFooter>
-                        <Button variant="secondary" onClick={() => setIsOpen(false)}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-600">
-                            Save
-                        </Button>
+                        <Button variant="secondary" onClick={() => setIsOpen(false)}>Cancel</Button>
+                        <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-600">Save</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

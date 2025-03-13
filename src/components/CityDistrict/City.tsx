@@ -83,10 +83,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { getCityList } from "@/services/cityService";
+import { addCity, deleteCity, getCityList, updateCity } from "@/services/cityService";
 
 interface City {
-    cityId: number;
+    cityId: string;
     name: string;
     description: string;
 }
@@ -126,24 +126,34 @@ const City = () => {
     };
 
     const handleSave = async () => {
-        const method = currentCity ? "PUT" : "POST";
-        const endpoint = currentCity ? `/api/cities/${currentCity.cityId}` : "/api/cities";
+        // const method = currentCity ? "PUT" : "POST";
+        // const endpoint = currentCity ? `/api/cities/${currentCity.cityId}` : "/api/cities";
         try {
-            await fetch(endpoint, {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, description }),
-            });
-            fetchCities();
-            setIsOpen(false);
+            // await fetch(endpoint, {
+            //     method,
+            //     headers: { "Content-Type": "application/json" },
+            //     body: JSON.stringify({ name, description }),
+            // });
+            if (!currentCity) {
+                const response = await addCity({ name, description });
+                // if(response.status === 200 || response.status === 201)
+            } else {
+                const response = await updateCity(currentCity.cityId, { name, description });
+            }
+            // fetchCities();
+            // setIsOpen(false);
         } catch (error) {
             console.error("Error saving city:", error);
+        } finally {
+            fetchCities();
+            setIsOpen(false);
         }
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         try {
-            await fetch(`/api/cities/${id}`, { method: "DELETE" });
+            // await fetch(`/api/cities/${id}`, { method: "DELETE" });
+            const response = await deleteCity(id);
             fetchCities();
         } catch (error) {
             console.error("Error deleting city:", error);

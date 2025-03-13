@@ -17,6 +17,7 @@ interface UserProfile {
     email: string;
     isActive: boolean;
     roleId: number;
+    profilePicture?: string;
 }
 
 export default function Profile() {
@@ -32,8 +33,10 @@ export default function Profile() {
         address: '',
         email: '',
         isActive: true,
-        roleId: 0
+        roleId: 0,
+        profilePicture: ''
     });
+    const [avataFile, setAvataFile] = React.useState<File | null>(null);
 
     useEffect(() => {
         getUserProfileInfo();
@@ -74,19 +77,36 @@ export default function Profile() {
         }));
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setAvataFile(file);
+        }
+    };
+
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
-            const profileUpdateData = {
-                userId: userInfo.userId,
-                username: userInfo.userName ? userInfo.userName : "",
-                phoneNumber: userInfo.phoneNumber ? userInfo.phoneNumber : "",
-                address: userInfo.address ? userInfo.address : ""
-            };
-            const response = await updateUserProfile(userInfo.userId, profileUpdateData);
+            // const profileUpdateData = {
+            //     userId: userInfo.userId,
+            //     username: userInfo.userName ? userInfo.userName : "",
+            //     phoneNumber: userInfo.phoneNumber ? userInfo.phoneNumber : "",
+            //     address: userInfo.address ? userInfo.address : ""
+            // };
+            const formData = new FormData();
+            formData.append("userId", userInfo.userId);
+            formData.append("username", userInfo.userName || "");
+            formData.append("phoneNumber", userInfo.phoneNumber || "");
+            formData.append("address", userInfo.address || "");
+
+            if (avataFile) {
+                formData.append("profilePicture", avataFile);
+            }
+
+            const response = await updateUserProfile(userInfo.userId, formData);
             if ((await response).status === 200) {
                 console.log("success update profile")
                 getUserProfileInfo();
@@ -109,8 +129,19 @@ export default function Profile() {
             <form className='w-3/4'>
                 <div className="space-y-12">
                     <div className="border-b border-gray-900/10 pb-12">
-                        <h2 className="text-base/7 font-semibold text-gray-900">Personal Information</h2>
-                        <p className="mt-1 text-sm/6 text-gray-600">Update your information here.</p>
+                        <div className="flex">
+                            <div className="flex flex-col m-1 w-1/4">
+                                <h2 className="text-base/7 font-semibold text-gray-900">Personal Information</h2>
+                                <p className="mt-1 text-sm/6 text-gray-600">Update your information here.</p>
+                            </div>
+                            <div className="mt-3 flex justify-center items-center w-3/4">
+                                <img
+                                    src={userInfo.profilePicture}
+                                    alt="Profile"
+                                    className="w-24 h-24 rounded-full border-2 border-gray-300 shadow-md object-cover"
+                                />
+                            </div>
+                        </div>
 
                         <div className="flex gap-4">
                             <Dialog open={isOpenUserInfo} onOpenChange={setIsOpenUserInfo}>
@@ -132,16 +163,46 @@ export default function Profile() {
                                                     {field === 'userName' ? 'User Name' :
                                                         field === 'phoneNumber' ? 'Phone Number' :
                                                             field === 'address' ? 'Address' :
-                                                                field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
+                                                                field === 'profilePicture' ? 'Profile Picture' :
+                                                                    field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
                                                 </Label>
-                                                <Input
+                                                {/* <Input
                                                     id={field}
                                                     name={field}
-                                                    type="text"
+                                                    type={field === 'profilePicture' ? 'file' : 'text'} // Ensuring profilePicture is text
                                                     value={userInfo[field as keyof UserProfile] as string}
                                                     onChange={handleInputChange}
                                                     className="col-span-3"
-                                                />
+                                                /> */}
+                                                {field === 'profilePicture' ? (
+                                                    <div className="col-span-3">
+                                                        <input
+                                                            id={field}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={handleFileChange}
+                                                            className="hidden"
+                                                        />
+                                                        <label
+                                                            htmlFor={field}
+                                                            className="cursor-pointer bg-black-2 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
+                                                        >
+                                                            Choose File
+                                                        </label>
+                                                        {userInfo.profilePicture && (
+                                                            <p className="mt-2 text-gray-600">{avataFile?.name}</p>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <Input
+                                                        id={field}
+                                                        name={field}
+                                                        type="text"
+                                                        value={userInfo[field as keyof UserProfile] as string}
+                                                        onChange={handleInputChange}
+                                                        className="col-span-3"
+                                                    />
+                                                )}
                                             </div>
                                         ))}
                                     <DialogFooter>
