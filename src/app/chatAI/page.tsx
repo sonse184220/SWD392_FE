@@ -13,7 +13,7 @@ import { MODEL_TO_FRIENDLY_NAME, SUPPORTED_MODELS } from "../../model-helpers";
 import { axiosInstance } from "../../../axiosInstance";
 
 // API function for sending messages to the backend
-export async function sendMessage(messageContent: string) {
+async function sendMessage(messageContent: string) {
   try {
     const response = await axiosInstance.post("/cityscout/ai/send-message", { message: messageContent });
     return response;
