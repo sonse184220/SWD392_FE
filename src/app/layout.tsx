@@ -33,20 +33,29 @@
 
 "use client";
 import "./globals.css";
-import "jsvectormap/dist/jsvectormap.css";
-import "flatpickr/dist/flatpickr.min.css";
-import "./css/satoshi.css";
-// import "./css/style.css";
+// import "jsvectormap/dist/jsvectormap.css";
+// import "flatpickr/dist/flatpickr.min.css";
+import "@/css/satoshi.css";
+import "@/css/style.css";
 import React, { useEffect, useState } from "react";
-import Loader from "./components/common/Loader";
+import Loader from "@/components/common/Loader";
+import Navbar from "@/components/Navbar/index";
+import Footer from "@/components/Footer/Footer";
+import { listenForNotifications } from "@/services/notificationService";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isAuthenticated, user, token } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const router = useRouter();
+  const pathname = usePathname();
 
   // const pathname = usePathname();
 
@@ -54,12 +63,48 @@ export default function RootLayout({
     setTimeout(() => setLoading(false), 1000);
   }, []);
 
+  useEffect(() => {
+    // requestNotificationPermission();
+    // listenForNotifications();
+  }, []);
+
+  // useEffect(() => {
+  //   // if (!isAuthenticated) {
+  //   //   router.push("/"); // Redirect to home if not authenticated
+  //   // } else 
+  //   if (user?.role === "Admin" && !pathname.startsWith("/admin")) {
+  //     router.push("/admin"); // Redirect to /admin if an admin is outside the admin section
+  //   } else if (user?.role === "User" && !pathname.startsWith("/user")) {
+  //     router.push("/user"); // Redirect to /user if a regular user is outside the user section
+  //   }
+  // }, [isAuthenticated, user, pathname, router]);
+  // if (!isAuthenticated) {
+  //   router.push("/");
+  // }
+
+  // if(isAuthenticated && user?.role === "Admin")
+  //   router.push("/admin");
+
+  useEffect(() => {
+    console.log("role", user?.role)
+    console.log("isAuthen", isAuthenticated)
+    if (pathname.startsWith("/admin")) {
+      if (!isAuthenticated || user?.role !== "Admin") {
+        console.log("Unauthorized access to admin section");
+        router.replace("/");
+      }
+    }
+
+  }, [isAuthenticated, user, pathname, router, loading]);
+
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
-        <div className="dark:bg-boxdark-2 dark:text-bodydark">
+        {/* <Navbar /> */}
+        {children}
+        {/* <div className="dark:bg-boxdark-2 dark:text-bodydark">
           {loading ? <Loader /> : children}
-        </div>
+        </div> */}
       </body>
     </html>
   );
