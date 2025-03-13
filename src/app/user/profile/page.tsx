@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { getUserProfile, updateUserProfile } from "@/services/profileService";
 import React, { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 interface UserProfile {
     userId: string;
@@ -18,6 +20,9 @@ interface UserProfile {
 }
 
 export default function Profile() {
+    const router = useRouter();
+    const { isAuthenticated, user, token } = useAuth();
+
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
     const [isOpenUserInfo, setIsOpenUserInfo] = React.useState<boolean>(false);
     const [userInfo, setUserInfo] = React.useState<UserProfile>({
@@ -95,6 +100,9 @@ export default function Profile() {
             setIsLoading(false);
         }
     };
+
+    if (!isAuthenticated && user?.role !== "User")
+        router.push("/");
 
     return (
         <div className='flex justify-center px-8 py-4 '>

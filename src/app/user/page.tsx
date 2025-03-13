@@ -5,9 +5,11 @@ import Provide from "@/components/Provide";
 import Why from "@/components/Why";
 import Network from "@/components/Network";
 import Clientsay from "@/components/Clientsay";
+import UserLayout from "./layout";
 
-export function UserPage() {
+export default function UserPage() {
     return (
+        // <UserLayout>
         <main>
             <Banner />
             <Companies />
@@ -17,5 +19,6 @@ export function UserPage() {
             <Network />
             <Clientsay />
         </main>
+        // </UserLayout>
     );
 }

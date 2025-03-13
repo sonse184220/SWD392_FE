@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { axiosInstance } from "../../../axiosInstance";
+import { axiosInstance } from "../../axiosInstance";
 
 export async function sendMessage(requestMessage: string): Promise<AxiosResponse> {
     try {

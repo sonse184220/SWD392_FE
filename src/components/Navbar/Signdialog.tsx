@@ -20,13 +20,12 @@ const Signin = () => {
 
     const handleSignIn = async () => {
         try {
-            console.log("called")
             const result = await signInWithPopup(auth, provider);
-            console.log("called 2")
+
             const firebaseToken = await result.user.getIdToken();
-            console.log(firebaseToken);
+
             const response = await login(firebaseToken);
-            console.log("response", response);
+
             if (response.status === 200) {
                 sessionStorage.setItem("token", response.data.accessToken)
                 window.dispatchEvent(new Event("sessionUpdate"));

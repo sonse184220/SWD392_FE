@@ -19,17 +19,18 @@ const Drawer = ({ children, isOpen, setIsOpen }: DrawerProps) => {
             }
         >
             <section
-        className={
-            "w-340px max-w-lg left-0 absolute bg-white h-full shadow-xl delay-400 duration-500 ease-in-out transition-all transform " +
-            (isOpen ? "translate-x-0" : "-translate-x-full")
-        }
-    >
- 
+                className={
+                    "w-340px max-w-lg left-0 absolute bg-white h-full shadow-xl delay-400 duration-500 ease-in-out transition-all transform " +
+                    (isOpen ? "translate-x-0" : "-translate-x-full")
+                }
+            >
+
                 <article className="relative w-270 max-w-lg pb-10 flex flex-col space-y-6 h-full">
                     <header className="p-4 flex items-center justify-between"><img
-                        className="h-12 w-40"
-                        src={"/assets/logo/logo.png"}
-                        alt="Courses-Logo"
+                        // className="h-12 w-40"
+                        className="block h-12 w-auto lg:hidden"
+                        src={"/cityscoutlogo.jpg"}
+                        alt="CityScout-Logo"
                         onClick={() => {
                             setIsOpen(false);
                         }}

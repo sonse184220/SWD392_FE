@@ -26,7 +26,7 @@ const navigation: NavigationItem[] = [
     { name: 'Services', href: '#services', current: false },
     { name: 'About', href: '#about', current: false },
     { name: 'Project', href: '#project', current: false },
-    { name: 'Help', href: '/', current: false },
+    { name: 'Places', href: '/user/destinations', current: false },
 ]
 
 function classNames(...classes: string[]) {
@@ -42,7 +42,7 @@ const Navbar: React.FC<Props> = ({ isLogin }) => {
             sessionStorage.removeItem("token")
             window.dispatchEvent(new Event("sessionUpdate"));
         } catch (error) {
-            console.error("Login Failed", error);
+            console.error("Logout Failed", error);
         }
     };
 
@@ -58,13 +58,13 @@ const Navbar: React.FC<Props> = ({ isLogin }) => {
                             <div className="flex flex-shrink-0 items-center">
                                 <img
                                     className="block h-12 w-auto lg:hidden"
-                                    src={'cityscoutlogo.jpg'}
+                                    src={'/cityscoutlogo.jpg'}
                                     alt="dsign-logo"
                                 />
                                 <img
                                     className="hidden h-12 w-auto lg:block"
                                     // src={'/assets/logo/logo.png'}
-                                    src={'cityscoutlogo.jpg'}
+                                    src={'/cityscoutlogo.jpg'}
                                     alt="dsign-logo"
                                 // width={160} // Adjust width as needed
                                 // height={48}
