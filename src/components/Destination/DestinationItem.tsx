@@ -67,9 +67,9 @@ const DestinationItem = ({ destination }: { destination: Destination }) => {
       viewport={{ once: true }}
       className="animate_top rounded-lg bg-white p-4 pb-9 shadow-solid-8 dark:bg-blacksection"
     >
-      <Link href={`/destination/${destination.destinationId}`} className="relative block aspect-[368/239]">
+      <Link href={`/destination/${destination.destinationId}`} className="rounded-lg relative block aspect-[368/239]">
         <Image
-          src="/images/default-destination.jpg" // Replace with actual image source if available
+          src="/travel4K.jpg" // Replace with actual image source if available
           alt={destinationName}
           fill
         />

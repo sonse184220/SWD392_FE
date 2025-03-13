@@ -8,8 +8,12 @@ import { getCityList } from "@/services/cityService";
 import { getDistrictList } from "@/services/districtService";
 import { getCategoryList } from "@/services/categoryService";
 import { getSubCategoryList } from "@/services/subCategoryService";
-import { getRecommendation } from "@/services/AI/geminiAIService";
+import { getRecommendation } from "@/services/geminiAIService";
 import { Destination } from "@/types/destination";
+import SectionHeader from "@/components/CommonHeader/SectionHeader";
+import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 
 interface City {
     cityId: number;
@@ -33,7 +37,10 @@ interface SubCategory {
     categoryId: number;
 }
 
-const BlogPage = () => {
+const DestinationRecommendPage = () => {
+    const [loading, setLoading] = React.useState<boolean>(false);
+    const [progress, setProgress] = React.useState<number>(0);
+
     // State for storing cities and districts (Initially empty, will be filled via API later)
     const [cities, setCities] = React.useState<City[]>([]);
     const [districts, setDistricts] = React.useState<District[]>([]);
@@ -130,38 +137,54 @@ const BlogPage = () => {
     };
 
     const handleSearch = async () => {
-        let promptParts: string[] = ["Recommend places"];
+        try {
+            setLoading(true);
+            setProgress(0);
 
-        if (selectedCity) {
-            promptParts.push(`in ${selectedCity.name}`);
-        }
+            let progressInterval = setInterval(() => {
+                setProgress((prev) => (prev < 90 ? prev + 10 : prev)); // Increment but stop at 90%
+            }, 500);
 
-        if (selectedDistrict) {
-            promptParts.push(`at ${selectedDistrict.name}`);
-        }
+            let promptParts: string[] = ["Recommend places"];
 
-        if (selectedCategories.length > 0) {
-            const categoryNames = categories
-                .filter(cat => selectedCategories.includes(cat.categoryId))
-                .map(cat => cat.name)
-                .join(", ");
-            promptParts.push(`about categories: ${categoryNames}`);
-        }
+            if (selectedCity) {
+                promptParts.push(`in ${selectedCity.name}`);
+            }
 
-        if (selectedSubCategories.length > 0) {
-            const subCategoryNames = subCategories
-                .filter(sub => selectedSubCategories.includes(sub.subCategoryId))
-                .map(sub => sub.name)
-                .join(", ");
-            promptParts.push(`covering subcategories: ${subCategoryNames}`);
-        }
+            if (selectedDistrict) {
+                promptParts.push(`at ${selectedDistrict.name}`);
+            }
 
-        const searchData = promptParts.join(" ") + "."; // Final prompt
-        console.log("Search Data:", searchData);
+            if (selectedCategories.length > 0) {
+                const categoryNames = categories
+                    .filter(cat => selectedCategories.includes(cat.categoryId))
+                    .map(cat => cat.name)
+                    .join(", ");
+                promptParts.push(`about categories: ${categoryNames}`);
+            }
 
-        const response = await getRecommendation(searchData);
-        if (response.status === 200) {
-            setDestinationList(response.data); // Update the list with fetched destinations
+            if (selectedSubCategories.length > 0) {
+                const subCategoryNames = subCategories
+                    .filter(sub => selectedSubCategories.includes(sub.subCategoryId))
+                    .map(sub => sub.name)
+                    .join(", ");
+                promptParts.push(`covering subcategories: ${subCategoryNames}`);
+            }
+
+            const searchData = promptParts.join(" ") + "."; // Final prompt
+
+            const response = await getRecommendation(searchData);
+            if (response.status === 200) {
+                setDestinationList(response.data); // Update the list with fetched destinations
+            }
+        } catch (error) {
+            console.error('Error fetching destinations:', error);
+        } finally {
+            setProgress(100);
+            setTimeout(() => {
+                setLoading(false);
+                setProgress(0); // Hide progress after a short delay
+            }, 500);
         }
     };
 
@@ -169,6 +192,23 @@ const BlogPage = () => {
 
     return (
         <>
+            <section id="features" className="py-10 lg:py-10 xl:py-10">
+                <div className="mx-auto max-w-c-1315 px-4 md:px-8 xl:px-0">
+                    {/* <!-- Section Title Start --> */}
+                    <SectionHeader
+                        headerInfo={{
+                            title: "SOLID FEATURES",
+                            subtitle: "Core Features of Solid",
+                            description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
+            convallis tortor eros. Donec vitae tortor lacus. Phasellus aliquam
+            ante in maximus.`,
+                        }}
+                    />
+                    {/* <!-- Section Title End --> */}
+
+                </div>
+            </section>
+
             <div className="container mx-auto px-4 md:px-8 lg:px-12 xl:px-16 py-10">
                 <div className="flex flex-col lg:flex-row gap-10">
                     {/* Sidebar - Auto-Height Based on Categories */}
@@ -273,12 +313,66 @@ const BlogPage = () => {
                     </aside>
 
                     {/* Destination Grid */}
-                    <section className="lg:w-3/4">
+                    {/* <section className="lg:w-3/4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             {destinationList.map((place, key) => (
                                 <DestinationItem key={key} destination={place} />
                             ))}
                         </div>
+                    </section> */}
+                    {/* Destination Grid */}
+                    <section className="lg:w-3/4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-md">
+                        {loading ? (
+                            // <LinearProgressWithLabel value={50} />} {/* Show progress when loading */}
+                            <div className="h-full w-full flex items-center justify-center">
+
+                                {/* <LinearProgress variant="determinate" className="w-3/4" /> */}
+                                <Box sx={{ width: '75%', display: 'flex', alignItems: 'center' }}>
+                                    <Box sx={{ width: '100%', mr: 1 }}>
+                                        <LinearProgress variant="determinate" value={progress} />
+                                    </Box>
+                                    <Box sx={{ minWidth: 35 }}>
+                                        <Typography
+                                            variant="body2"
+                                            sx={{ color: 'text.secondary' }}
+                                        >
+                                            {`${Math.round(progress)}%`}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </div>
+                        )
+                            :
+                            ((destinationList.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {destinationList.map((place, key) => (
+                                        <DestinationItem key={key} destination={place} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center text-center py-20">
+                                    <img src="/noresult.png" alt="No results" className="w-48 h-48 mb-6 opacity-75" />
+                                    <h3 className="text-xl font-semibold text-gray-800 dark:text-white">No destinations found</h3>
+                                    <p className="text-gray-600 dark:text-gray-400 mt-2">
+                                        Try adjusting your filters or selecting a different city.
+                                    </p>
+                                </div>
+                            )))}
+                        {/* {destinationList.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {destinationList.map((place, key) => (
+                                    <DestinationItem key={key} destination={place} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center text-center py-20">
+                                <img src="/noresult.png" alt="No results" className="w-48 h-48 mb-6 opacity-75" />
+                                <h3 className="text-xl font-semibold text-gray-800 dark:text-white">No destinations found</h3>
+                                <p className="text-gray-600 dark:text-gray-400 mt-2">
+                                    Try adjusting your filters or selecting a different city.
+                                </p>
+                            </div>
+                        )} */}
                     </section>
                 </div>
             </div>
@@ -286,4 +380,4 @@ const BlogPage = () => {
     );
 };
 
-export default BlogPage;
+export default DestinationRecommendPage;

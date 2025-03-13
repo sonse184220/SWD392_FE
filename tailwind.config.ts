@@ -9,7 +9,8 @@ const config: Config = {
 		"./src/**/*.{js,ts,jsx,tsx}", // Make sure Tailwind scans your source files
 		"./src/app/css/**/*.css",
 	],
-	darkMode: ["class", "class"],
+	// darkMode: ["class", "class"],
+	darkMode: "class",
 	theme: {
 		fontFamily: {
 			satoshi: [

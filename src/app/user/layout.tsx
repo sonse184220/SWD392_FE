@@ -54,11 +54,13 @@ export default function UserLayout({
 
 
     return (
-        <html lang="en">
-            <body suppressHydrationWarning={true}>
-                <Navbarin isLogin={isLogin} />
-                {children}
-            </body>
-        </html>
+        // <html lang="en">
+        // <body suppressHydrationWarning={true}>
+        <div>
+            <Navbarin isLogin={isLogin} />
+            {children}
+        </div>
+        // </body>
+        // </html>
     );
 }

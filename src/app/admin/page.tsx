@@ -1,3 +1,4 @@
+"use client"
 import { Metadata } from "next";
 import ECommerce from "@/components/Dashboard/E-commerce";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
@@ -9,19 +10,16 @@ import Why from "@/components/Why";
 import Network from "@/components/Network";
 import Clientsay from "@/components/Clientsay";
 import Newsletter from "@/components/Newsletter/Newsletter";
+import AdminLayout from "./layout";
 
-export const metadata: Metadata = {
-    title:
-        "Next.js E-commerce Dashboard | TailAdmin - Next.js Dashboard Template",
-    description: "This is Next.js Home for TailAdmin Dashboard Template",
-};
-
-export default function Home() {
+export default function Admin() {
     return (
         <main>
-            <DefaultLayout>
-                <ECommerce />
-            </DefaultLayout>
+            <AdminLayout>
+                <DefaultLayout>
+                    <ECommerce />
+                </DefaultLayout>
+            </AdminLayout>
             {/* <Banner />
       <Companies />
       <Buyers />
