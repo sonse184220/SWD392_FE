@@ -1,6 +1,11 @@
 import { messaging, getToken, onMessage } from "../../firebaseMessaging";
 
 export const requestNotificationPermission = async () => {
+    if (typeof window === "undefined" || !messaging) {
+        console.log("Notification not available in this environment");
+        return;
+    }
+
     try {
         const permission = await Notification.requestPermission();
         if (permission === "granted") {
@@ -36,6 +41,9 @@ export const requestNotificationPermission = async () => {
 //     });
 // };
 export const listenForNotifications = () => {
+    if (typeof window === "undefined" || !messaging) {
+        return;
+    }
     onMessage(messaging, (payload) => {
         console.log("📩 Nhận được thông báo:", payload);
 
