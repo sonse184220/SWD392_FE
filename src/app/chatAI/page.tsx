@@ -32,11 +32,9 @@ function AiChat() {
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // Define avatar URLs with fallback
-  const USER_AVATAR = "tourists.jpg"; // Placeholder cho user avatar
-  const AI_AVATAR = "cityscoutlogo.jpg"; // Placeholder cho AI avatar
+  const USER_AVATAR = "tourists.jpg"; 
+  const AI_AVATAR = "cityscoutlogo.jpg";
 
-  // Add a welcome message when the component mounts
   useEffect(() => {
     const welcomeMessage: Message = {
       id: Date.now().toString(),
@@ -46,17 +44,15 @@ function AiChat() {
     setMessages([welcomeMessage]);
   }, []);
 
-  // Handle sending messages with custom API
   async function handleSendMessage() {
     if (!input.trim()) return;
-
+  
     try {
       setIsLoading(true);
       const messageContent = input;
       console.log("Sending message:", messageContent);
       setInput("");
-
-      // Add user message to the chat
+  
       const userMessage: Message = {
         id: Date.now().toString(),
         content: messageContent,
@@ -65,20 +61,17 @@ function AiChat() {
       };
       setMessages((prev) => [...prev, userMessage]);
       setAttachment(null);
-
-      // Call the custom API endpoint
+  
       const response = await sendMessage(messageContent);
       console.log("API Response:", response.data);
-
-      // Add assistant response to the chat
+  
       const assistantMessage: Message = {
         id: Date.now().toString(),
-        content: response.data.message || response.data || "No response received",
+        content: response.data.response || response.data.message || "No response received",
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
-
-      // Scroll to the latest message only if user is already at the bottom
+  
       if (chatContainerRef.current) {
         const isAtBottom = chatContainerRef.current.scrollHeight - chatContainerRef.current.scrollTop === chatContainerRef.current.clientHeight;
         if (isAtBottom) {
@@ -98,24 +91,22 @@ function AiChat() {
     }
   }
 
-  // Handle suggestion clicks
   async function handleSuggestionClick(content: string) {
     try {
       setIsLoading(true);
       const userMessage: Message = { id: Date.now().toString(), content, role: "user" };
       setMessages((prev) => [...prev, userMessage]);
-
+  
       const response = await sendMessage(content);
       console.log("API Response from suggestion:", response.data);
-
+  
       const assistantMessage: Message = {
         id: Date.now().toString(),
-        content: response.data.message || response.data || "No response received",
+        content: response.data.response || response.data.message || "No response received",
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
-
-      // Scroll to the latest message only if user is already at the bottom
+  
       if (chatContainerRef.current) {
         const isAtBottom = chatContainerRef.current.scrollHeight - chatContainerRef.current.scrollTop === chatContainerRef.current.clientHeight;
         if (isAtBottom) {
