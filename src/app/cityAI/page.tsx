@@ -13,6 +13,22 @@ interface City {
   similarPlaces?: { name: string; image: string; description: string }[];
 }
 
+const popularPlaces = [
+  {
+    name: "Halong Bay",
+    image: "/quangninh/vinhhalong.webp",
+    description: "A stunning natural wonder in northern Vietnam with emerald waters and limestone islands."
+  },
+  {
+    name: "Banahills",
+    image: "/danang/banahill.webp",
+    description: "A hill station and resort in the Truong Son Mountains near Da Nang."},
+  {
+    name: "Da Lat",
+    image: "/dalat/thacdatanla.webp",
+    description: "A city in the Central Highlands region of Vietnam known for its cool climate and French colonial architecture."}
+];
+
 export default function CityPage() {
   const [cities, setCities] = useState<City[]>([]);
   const [selectedCity, setSelectedCity] = useState<string>("");
@@ -44,14 +60,14 @@ export default function CityPage() {
       <div className="max-w-7xl mx-auto px-4 py-10">
         {/* Main image */}
         <div className="w-full h-[450px] relative rounded-lg shadow-lg overflow-hidden">
-          {currentCity?.image && (
+          {/* {currentCity?.image && ( */}
             <Image
-              src={currentCity.image}
-              alt={currentCity.name}
+              src="/danang/phocohoian.webp"
+              alt="Ancient Town, Hoi An, Vietnam"
               layout="fill"
               objectFit="cover"
             />
-          )}
+          
         </div>
 
         {/* City selection dropdown */}
@@ -87,41 +103,31 @@ export default function CityPage() {
           </div>
         </div>
 
-        {/* Similar places section */}
-        {currentCity?.similarPlaces && currentCity.similarPlaces.length > 0 && (
-          <div className="max-w-[1500px] mx-auto px-4 py-10">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-              Similar Destinations
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {currentCity.similarPlaces.map((place, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-                >
-                  <div className="relative h-48 w-full">
-                    <Image
-                      src={place.image}
-                      alt={place.name}
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-t-lg"
-                      onError={(e) => console.log(`Image failed to load: ${place.image}`)}
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      {place.name}
-                    </h3>
-                    <p className="text-gray-600 mt-2 text-sm">
-                      {place.description}
-                    </p>
-                  </div>
+        <div className="max-w-[1500px] mx-auto px-4 py-10">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Popular Places</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {popularPlaces.map((place, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              >
+                <div className="relative h-48 w-full">
+                  <Image
+                    src={place.image}
+                    alt={place.name}
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded-t-lg"
+                  />
                 </div>
-              ))}
-            </div>
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold text-gray-800">{place.name}</h3>
+                  <p className="text-gray-600 mt-2 text-sm">{place.description}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
     </>
   );
