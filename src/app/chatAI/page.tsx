@@ -11,7 +11,7 @@ import { AiChatSent } from "@/subframe/components/AiChatSent";
 import { AiChatSuggestion } from "@/subframe/components/AiChatSuggestion";
 import { MODEL_TO_FRIENDLY_NAME, SUPPORTED_MODELS } from "../../model-helpers";
 import { axiosInstance } from "../../../axiosInstance";
-
+import { IoIosAttach } from "react-icons/io";
 // API function for sending messages to the backend
 async function sendMessage(messageContent: string) {
   try {
@@ -32,11 +32,9 @@ function AiChat() {
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // Define avatar URLs with fallback
-  const USER_AVATAR = "tourists.jpg"; // Placeholder cho user avatar
-  const AI_AVATAR = "cityscoutlogo.jpg"; // Placeholder cho AI avatar
+  const USER_AVATAR = "tourists.jpg"; 
+  const AI_AVATAR = "cityscoutlogo.jpg";
 
-  // Add a welcome message when the component mounts
   useEffect(() => {
     const welcomeMessage: Message = {
       id: Date.now().toString(),
@@ -46,17 +44,15 @@ function AiChat() {
     setMessages([welcomeMessage]);
   }, []);
 
-  // Handle sending messages with custom API
   async function handleSendMessage() {
     if (!input.trim()) return;
-
+  
     try {
       setIsLoading(true);
       const messageContent = input;
       console.log("Sending message:", messageContent);
       setInput("");
-
-      // Add user message to the chat
+  
       const userMessage: Message = {
         id: Date.now().toString(),
         content: messageContent,
@@ -65,20 +61,17 @@ function AiChat() {
       };
       setMessages((prev) => [...prev, userMessage]);
       setAttachment(null);
-
-      // Call the custom API endpoint
+  
       const response = await sendMessage(messageContent);
       console.log("API Response:", response.data);
-
-      // Add assistant response to the chat
+  
       const assistantMessage: Message = {
         id: Date.now().toString(),
-        content: response.data.message || response.data || "No response received",
+        content: response.data.response || response.data.message || "No response received",
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
-
-      // Scroll to the latest message only if user is already at the bottom
+  
       if (chatContainerRef.current) {
         const isAtBottom = chatContainerRef.current.scrollHeight - chatContainerRef.current.scrollTop === chatContainerRef.current.clientHeight;
         if (isAtBottom) {
@@ -98,24 +91,22 @@ function AiChat() {
     }
   }
 
-  // Handle suggestion clicks
   async function handleSuggestionClick(content: string) {
     try {
       setIsLoading(true);
       const userMessage: Message = { id: Date.now().toString(), content, role: "user" };
       setMessages((prev) => [...prev, userMessage]);
-
+  
       const response = await sendMessage(content);
       console.log("API Response from suggestion:", response.data);
-
+  
       const assistantMessage: Message = {
         id: Date.now().toString(),
-        content: response.data.message || response.data || "No response received",
+        content: response.data.response || response.data.message || "No response received",
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
-
-      // Scroll to the latest message only if user is already at the bottom
+  
       if (chatContainerRef.current) {
         const isAtBottom = chatContainerRef.current.scrollHeight - chatContainerRef.current.scrollTop === chatContainerRef.current.clientHeight;
         if (isAtBottom) {
@@ -135,7 +126,7 @@ function AiChat() {
 
   return (
     <div className="container max-w-none flex h-full w-full flex-col items-center gap-8 bg-default-background pt-16 pr-8 pl-8">
-      <div className="flex w-full max-w-[768px] items-center gap-6">
+      <div className="flex w-full max-w-[1200px] items-center gap-6">
         <div className="flex grow shrink-0 basis-0 items-center gap-3">
           <SubframeCore.Icon
             className="text-heading-2 font-heading-2 text-default-background"
@@ -179,7 +170,7 @@ function AiChat() {
           </SubframeCore.DropdownMenu.Root>
         </div>
       </div>
-      <div className="flex w-full max-w-[768px] flex-col items-start">
+      <div className="flex w-full max-w-[1200px] mt-[15px] flex-col items-start">
         {/* Chat container with fixed height and scroll */}
         <div
           ref={chatContainerRef}
@@ -223,116 +214,120 @@ function AiChat() {
                 >
                   <div className="flex flex-col gap-3">
                     <span className="grow shrink-0 basis-0 text-body font-body text-default-font">
-                      Start chatting with me! Pick a suggestion below or type your message.
+                      Start chatting with CityScout! Pick a suggestion below or type your message.
                     </span>
                   </div>
                 </AiChatSent>
                 <AiChatSuggestion
-                  text="Plan a relaxing day"
-                  onClick={() =>
-                    handleSuggestionClick(
-                      "Could you help me plan a relaxing day that focuses on activities for rejuvenation? To start, can you ask me what my favorite forms of relaxation are?"
-                    )
-                  }
-                />
-                <AiChatSuggestion
-                  text="Thank my interviewer"
-                  onClick={() =>
-                    handleSuggestionClick(
-                      "Write 2-3 sentences to thank my interviewer, reiterating my excitement for the job opportunity while keeping it cool. Don't make it too formal."
-                    )
-                  }
-                />
-                <AiChatSuggestion
-                  text="Fun fact about Roman Empire"
-                  onClick={() => handleSuggestionClick("Tell me a random fun fact about the Roman Empire")}
-                />
+              text="Điểm du lịch nổi bật"
+              onClick={() =>
+                handleSuggestionClick(
+                  "Bạn có thể giới thiệu cho tôi một số điểm du lịch nổi bật ở Việt Nam không? Hãy gợi ý cả địa điểm thiên nhiên và văn hóa nhé!"
+                )
+              }
+            />
+            <AiChatSuggestion
+              text="Lịch trình du lịch 3 ngày"
+              onClick={() =>
+                handleSuggestionClick(
+                  "Tôi muốn lên lịch trình du lịch 3 ngày ở Việt Nam. Bạn có thể gợi ý những địa điểm đẹp, món ăn ngon và các hoạt động thú vị không?"
+                )
+              }
+            />
+            <AiChatSuggestion
+              text="Món ăn đường phố Việt Nam"
+              onClick={() =>
+                handleSuggestionClick(
+                  "Gợi ý cho tôi một số món ăn đường phố ngon nhất ở Việt Nam mà du khách không nên bỏ lỡ!"
+                )
+              }
+            />
+            <AiChatSuggestion
+              text="Bãi biển đẹp ở Việt Nam"
+              onClick={() =>
+                handleSuggestionClick(
+                  "Bạn có thể giới thiệu cho tôi một số bãi biển đẹp nhất ở Việt Nam không? Tôi muốn tìm nơi thư giãn và tận hưởng thiên nhiên."
+                )
+              }
+            />
+            <AiChatSuggestion
+              text="Trải nghiệm văn hóa Việt Nam"
+              onClick={() =>
+                handleSuggestionClick(
+                  "Tôi muốn tìm hiểu về văn hóa Việt Nam. Bạn có thể gợi ý những hoạt động hoặc lễ hội mà tôi nên tham gia không?"
+                )
+              }
+            />
+
               </div>
             )}
           </div>
         </div>
-        {/* Input container fixed at the bottom */}
-        <div className="w-full max-w-[768px] bg-default-background p-4">
-          <input
-            type="file"
-            ref={fileInputRef}
-            className="hidden"
-            accept=".png,.jpeg,.gif,.webp"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              if (!event.target.files) return;
-              const file = event.target.files[0];
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                if (e.target?.result && typeof e.target.result === "string") {
-                  setAttachment({
-                    name: file.name,
-                    url: e.target.result,
-                    contentType: file.type,
-                  });
-                }
-              };
-              reader.readAsDataURL(file);
-            }}
+        <div className="w-full max-w-[1200px] mx-auto bg-white shadow-lg rounded-2xl p-3 mt-3">
+      {/* Attachment Preview */}
+      {attachment && (
+        <div className="flex items-center gap-3 p-2 bg-gray-100 rounded-lg mb-2 relative">
+          <img
+            src={attachment.url}
+            alt={attachment.name}
+            className="h-14 w-14 object-cover rounded-md"
           />
-          <div className="flex w-full items-end gap-3 overflow-hidden rounded-2xl bg-neutral-100 pt-4 pr-6 pb-4 pl-6">
-            <SubframeCore.DropdownMenu.Root>
-              <SubframeCore.DropdownMenu.Trigger asChild={true}>
-                <IconButton variant="brand-tertiary" />
-              </SubframeCore.DropdownMenu.Trigger>
-              <SubframeCore.DropdownMenu.Portal>
-                <SubframeCore.DropdownMenu.Content side="top" align="start" sideOffset={4} asChild={true}>
-                  <DropdownMenu>
-                    <DropdownMenu.DropdownItem
-                      icon="FeatherImage"
-                      onSelect={() => fileInputRef.current?.click()}
-                    >
-                      Add image
-                    </DropdownMenu.DropdownItem>
-                  </DropdownMenu>
-                </SubframeCore.DropdownMenu.Content>
-              </SubframeCore.DropdownMenu.Portal>
-            </SubframeCore.DropdownMenu.Root>
-            <div className="flex grow shrink-0 basis-0 flex-col items-start gap-6">
-              {attachment && (
-                <div className="flex flex-col items-start gap-3 pl-6">
-                  <div className="flex items-start gap-3 relative group">
-                    <img
-                      className="h-12 w-12 flex-none object-cover rounded-md"
-                      alt={attachment.name}
-                      src={attachment.url}
-                      onError={(e) => console.log(`Attachment preview failed to load:`, e)}
-                    />
-                    <IconButton
-                      className="absolute -right-2 -top-2 hidden group-hover:flex rounded-full"
-                      variant="neutral-primary"
-                      size="small"
-                      icon="FeatherX"
-                      onClick={() => setAttachment(null)}
-                    />
-                  </div>
-                </div>
-              )}
-              <div className="flex w-full items-center gap-3">
-                <input
-                  type="text"
-                  placeholder="Chat with me..."
-                  value={input}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInput(event.target.value)}
-                  onKeyDown={async (event) => {
-                    if (event.key === "Enter" && !isLoading) {
-                      await handleSendMessage();
-                    }
-                  }}
-                  disabled={isLoading}
-                  className="chat-input h-auto grow shrink-0 basis-0 rounded-lg border border-gray-300 p-2"
-                />
-              </div>
-            </div>
-          </div>
-          <span className="w-full text-caption font-caption text-subtext-color text-center mt-2">
-            AI can make mistakes. Always double check the source.
-          </span>
+          <button
+            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 text-xs"
+            onClick={() => setAttachment(null)}
+          >
+           X
+          </button>
         </div>
+      )}
+
+      {/* Chat Input */}
+      <div className="flex items-center gap-3 bg-gray-100 rounded-full p-3">
+        <button
+          className="text-gray-500 hover:text-gray-700"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <IoIosAttach size={24} />
+        </button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          accept=".png,.jpeg,.gif,.webp"
+          onChange={(event) => {
+            if (!event.target.files) return;
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              if (e.target?.result && typeof e.target.result === "string") {
+                setAttachment({ name: file.name, url: e.target.result });
+              }
+            };
+            reader.readAsDataURL(file);
+          }}
+        />
+        <input
+          type="text"
+          placeholder="Chat with me..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+          className="flex-grow bg-transparent outline-none text-gray-800 placeholder-gray-500"
+        />
+        <button
+          className="bg-blue-500 text-white px-6 py-2 rounded-full 
+                    hover:bg-blue-600 hover:shadow-lg hover:scale-105 
+                    transition-all duration-300 ease-in-out"
+          onClick={handleSendMessage}
+        >
+          Send
+        </button>
+
+      </div>
+      <p className="text-center text-sm text-gray-400 mt-2">
+        AI can make mistakes. Always double-check the source.
+      </p>
+      </div>
       </div>
     </div>
   );
