@@ -53,7 +53,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 const DestinationItem = ({ destination }: { destination: Destination }) => {
-  const { destinationName, address, description, rate, district } = destination;
+  // const { destinationName, address, description, rate, district } = destination;
+  const { destinationID, destinationName, address, description, rate, district, districtName } = destination;
 
   return (
     <motion.div
@@ -67,18 +68,32 @@ const DestinationItem = ({ destination }: { destination: Destination }) => {
       viewport={{ once: true }}
       className="animate_top rounded-lg bg-white p-4 pb-9 shadow-solid-8 dark:bg-blacksection"
     >
-      <Link href={`/destination/${destination.destinationId}`} className="rounded-lg relative block aspect-[368/239]">
+      <Link href={`/user/destinations/destination-details/${destination.destinationID}`} className="rounded-lg relative block aspect-[368/239]">
         <Image
           src="/travel4K.jpg" // Replace with actual image source if available
-          alt={destinationName}
+          // alt={destinationName}
+          alt={destinationName || ""}
           fill
         />
       </Link>
       <div className="px-4">
         <h3 className="mb-3.5 mt-7.5 line-clamp-2 inline-block text-lg font-medium text-black duration-300 hover:text-primary dark:text-white dark:hover:text-primary xl:text-itemtitle2">
-          <Link href={`/destination/${destination.destinationId}`}>{destinationName}</Link>
+          <Link href={`/destination/${destination.destinationID}`}>{destinationName}</Link>
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{address}, {district.name}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {/* {address}, {district.name} */}
+          {/* {address}, {district?.name}{city ? `, ${city.name}` : ""} */}
+          {/* {address}, {district?.name}{district?.city ? `, ${district.city.name}` : ""} */}
+          {address}
+          {district?.name ?
+            <>
+              , {district.name}
+              {district.city ? `, ${district.city.name}` : ""}
+            </>
+            :
+            districtName ? `, ${districtName}` : ""
+          }
+        </p>
         {/* , {city.name} */}
         <p className="line-clamp-3 mt-2">{description}</p>
         <p className="mt-2 text-yellow-500 font-bold">⭐ {rate}</p>

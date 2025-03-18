@@ -14,6 +14,7 @@ import SectionHeader from "@/components/CommonHeader/SectionHeader";
 import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import { ollamaSearch } from "@/services/ollamaAIService";
 
 interface City {
     cityId: number;
@@ -173,9 +174,25 @@ const DestinationRecommendPage = () => {
 
             const searchData = promptParts.join(" ") + "."; // Final prompt
 
-            const response = await getRecommendation(searchData);
+            const response = await ollamaSearch(searchData);
             if (response.status === 200) {
-                setDestinationList(response.data); // Update the list with fetched destinations
+                // setDestinationList(response.data); // Update the list with fetched destinations
+                // Normalize data structure
+                const normalizedData = response.data.results.map((destination: any) => ({
+                    destinationID: destination.destinationID ?? destination.id,
+                    destinationName: destination.destinationName ?? destination.name,
+                    address: destination.address,
+                    description: destination.description,
+                    rate: destination.rate,
+                    categoryID: destination.categoryID,
+                    ward: destination.ward,
+                    status: destination.status,
+                    categoryName: destination.categoryName,
+                    districtName: destination.districtName,
+                    openTime: destination.openTime,
+                    closeTime: destination.closeTime
+                }));
+                setDestinationList(normalizedData);
             }
         } catch (error) {
             console.error('Error fetching destinations:', error);
@@ -264,7 +281,7 @@ const DestinationRecommendPage = () => {
                                 ))}
                             </ul> */}
                             {/* Category Selection (Checkbox) */}
-                            <div className="mb-4">
+                            <div className="mb-4 max-h-70 overflow-auto">
                                 <label className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1">
                                     Select Categories
                                 </label>

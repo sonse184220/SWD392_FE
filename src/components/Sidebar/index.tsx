@@ -97,6 +97,30 @@ const menuGroups = [
         label: "Category",
         route: "/admin/category",
       },
+
+
+      {
+        icon: (
+          <svg
+            className="fill-current"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 20H20M16.5 3.5C16.8978 3.10218 17.4374 2.87868 18 2.87868C18.5626 2.87868 19.1022 3.10218 19.5 3.5C19.8978 3.89782 20.1213 4.43738 20.1213 5C20.1213 5.56262 19.8978 6.10218 19.5 6.5L7 19L3 20L4 16L16.5 3.5Z"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ),
+        label: "Destinations",
+        route: "/admin/destinations",
+      },
       // {
       //   icon: (
       //     <svg

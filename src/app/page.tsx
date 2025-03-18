@@ -17,7 +17,7 @@ export default function Home() {
 
   useEffect(() => {
     document.title = 'Travel Advise | CityScout';
-  }, []);
+  }, [router, pathname]);
 
   return null;
 

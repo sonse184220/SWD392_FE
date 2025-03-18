@@ -18,17 +18,45 @@
 //   publishedAt?: string;
 // };
 
+// export type Destination = {
+//   destinationId: number;
+//   destinationName: string;
+//   address: string;
+//   description: string;
+//   rate: number;
+//   categoryId: number;
+//   ward: string;
+//   status: string;
+//   districtId: number;
+//   district: {
+//     districtId: number;
+//     name: string;
+//     description: string;
+//     cityId: number;
+//     city: {
+//       cityId: number;
+//       name: string;
+//       description: string;
+//     };
+//   };
+// };
+
 export type Destination = {
-  destinationId: number;
-  destinationName: string;
-  address: string;
-  description: string;
-  rate: number;
-  categoryId: number;
-  ward: string;
-  status: string;
-  districtId: number;
-  district: {
+  destinationID?: string; // New API
+  id?: string; // Old API
+  destinationName?: string;
+  name?: string; // Old API
+  address?: string;
+  description?: string;
+  rate?: string;
+  categoryID?: string;
+  ward?: string;
+  status?: string;
+  categoryName?: string;
+  districtName?: string;
+  openTime?: string;
+  closeTime?: string;
+  district?: {
     districtId: number;
     name: string;
     description: string;
@@ -39,4 +67,4 @@ export type Destination = {
       description: string;
     };
   };
-};
+}
