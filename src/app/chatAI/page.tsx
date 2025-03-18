@@ -170,7 +170,7 @@ function AiChat() {
           </SubframeCore.DropdownMenu.Root>
         </div>
       </div>
-      <div className="flex w-full max-w-[1200px] mt-[25px] flex-col items-start">
+      <div className="flex w-full max-w-[1200px] mt-[15px] flex-col items-start">
         {/* Chat container with fixed height and scroll */}
         <div
           ref={chatContainerRef}

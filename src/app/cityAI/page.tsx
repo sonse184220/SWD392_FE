@@ -5,7 +5,10 @@ import Image from "next/image";
 import AiChat from "../chatAI/page";
 import { getCityList } from "@/services/cityService";
 import React from "react";
-
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, EffectFade } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/effect-fade";
 interface City {
   name: string;
   image: string;
@@ -54,21 +57,32 @@ export default function CityPage() {
   }, []);
 
   const currentCity = cities.find(city => city.name === selectedCity);
-
+  const images = [
+    "/danang/phocohoian.webp",
+    "/danang/banahill.webp",
+    "/dalat/nuilangbiang.webp",
+    "/quangninh/vinhhalong.webp"
+  ];
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 py-10">
+      <div className="max-w-8xl mx-auto px-4 py-10">
         {/* Main image */}
-        <div className="w-full h-[450px] relative rounded-lg shadow-lg overflow-hidden">
-          {/* {currentCity?.image && ( */}
-            <Image
-              src="/danang/phocohoian.webp"
-              alt="Ancient Town, Hoi An, Vietnam"
-              layout="fill"
-              objectFit="cover"
-            />
-          
-        </div>
+        <div className="w-full h-[600px] relative rounded-lg shadow-lg overflow-hidden">
+      <Swiper
+        modules={[Autoplay, EffectFade]}
+        spaceBetween={0}
+        slidesPerView={1}
+        autoplay={{ delay: 3000, disableOnInteraction: false }}
+        effect="fade"
+        className="w-full h-full"
+      >
+        {images.map((src, index) => (
+          <SwiperSlide key={index} className="relative w-full h-full">
+            <Image src={src} alt={`Slide ${index + 1}`} layout="fill" objectFit="cover" />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </div>
 
         {/* City selection dropdown */}
         <div className="flex justify-center mt-6">

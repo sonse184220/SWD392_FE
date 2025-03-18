@@ -34,7 +34,7 @@ const Banner = () => {
                                     type="button"
                                     // className="text-white font-medium bg-blue-500 py-4 px-10 rounded-md transition-all duration-300 ease-in-out 
                                     // hover:bg-blue-600 hover:scale-105 hover:shadow-xl"
-                                    className="text-15px text-white font-medium bg-blue py-5 px-9 mt-2 leafbutton"
+                                    className="text-15px text-white font-medium bg-blue py-5 px-9 mt-2 transition duration-150 ease-in-out hover:text-blue hover:bg-white leafbutton"
                                 >
                                     See our portfolio
                                 </button>
@@ -42,7 +42,7 @@ const Banner = () => {
                                     type="button"
                                     // className="text-white font-medium bg-blue-500 py-4 px-10 border border-gray-300 rounded-md transition-all duration-300 ease-in-out 
                                     // hover:bg-blue-600 hover:border-blue-800 hover:scale-105 hover:shadow-xl"
-                                    className="text-15px ml-4 mt-2 text-blue transition duration-150 ease-in-out hover:text-white hover:bg-blue font-medium py-5 px-16 border border-lightgrey leafbutton"
+                                    className="text-15px ml-4 mt-2 bg-blue text-white transition duration-150 ease-in-out hover:text-blue hover:bg-white font-medium py-5 px-16 border border-lightgrey leafbutton"
                                 >
                                     More info
                                 </button>
