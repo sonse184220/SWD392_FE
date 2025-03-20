@@ -31,7 +31,7 @@ async function handler(req: NextRequest) {
         }
 
         // Reconstruct the full URL to the actual backend
-        const backendUrl = `http://cityscouttravel.somee.com/api/${apiPath}`;
+        const backendUrl = `http://cityscouttravel.somee.com/${apiPath}`;
         console.log(`Forwarding request to: ${backendUrl}`);
 
         const headers = {
