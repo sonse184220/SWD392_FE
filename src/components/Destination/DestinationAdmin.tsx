@@ -17,6 +17,7 @@ interface Destination {
     ward: string;
     status: string;
     districtId: string;
+    imageUrl: string;
 }
 
 interface Category {
@@ -60,6 +61,9 @@ const Destination = () => {
     const [districtId, setDistrictId] = useState("");
     const [status, setStatus] = useState("Active");
     const [ward, setWard] = useState("");
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imageView, setImageView] = useState<string | null>(null);
+
 
     useEffect(() => {
         setIsLoading(true);
@@ -107,6 +111,7 @@ const Destination = () => {
             setDistrictId(destination.districtId);
             setWard(destination.ward);
             setStatus(destination.status);
+            if (destination.imageUrl) setImageView(destination.imageUrl);
         } else {
             setCurrentDestination(null);
             setDestinationName("");
@@ -117,13 +122,21 @@ const Destination = () => {
             setDistrictId("");
             setWard("");
             setStatus("Active");
+            setImageFile(null);
+            setImageView(null);
         }
         setIsOpen(true);
     };
 
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            setImageFile(event.target.files[0]);
+        }
+    };
+
     const handleSave = async () => {
         try {
-            const destinationData = { destinationName, address, description, rate, categoryId, districtId, status, ward };
+            const destinationData = { destinationName, address, description, rate, categoryId, districtId, status, ward, imageFile };
             if (!currentDestination) {
                 await addDestination(destinationData);
             } else {
@@ -228,6 +241,19 @@ const Destination = () => {
                         <option value="Inactive"
                             className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none">Inactive</option>
                     </select>
+                    {imageView && (
+                        <img
+                            src={imageView}
+                            alt="Current"
+                            className="h-32 w-32 object-cover my-2"
+                        />
+                    )}
+                    <Input type="file" accept="image/*" onChange={handleFileChange}
+                        className="mt-4 w-full h-auto cursor-pointer rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 
+                         file:mr-4 file:rounded-md file:border-0 file:bg-blue-600  file:text-black-2 
+                         hover:file:bg-blue-500 focus:border-blue-500 focus:outline-none transition duration-300 file:cursor-pointer"
+                    // className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                    />
                     <DialogFooter>
                         <Button variant="secondary" onClick={() => setIsOpen(false)}>Cancel</Button>
                         <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-600">Save</Button>

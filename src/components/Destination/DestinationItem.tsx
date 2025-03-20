@@ -54,7 +54,7 @@ import Link from "next/link";
 
 const DestinationItem = ({ destination }: { destination: Destination }) => {
   // const { destinationName, address, description, rate, district } = destination;
-  const { destinationID, destinationName, address, description, rate, district, districtName } = destination;
+  const { destinationId, destinationName, address, description, rate, district, districtName } = destination;
 
   return (
     <motion.div
@@ -68,7 +68,7 @@ const DestinationItem = ({ destination }: { destination: Destination }) => {
       viewport={{ once: true }}
       className="animate_top rounded-lg bg-white p-4 pb-9 shadow-solid-8 dark:bg-blacksection"
     >
-      <Link href={`/user/destinations/destination-details/${destination.destinationID}`} className="rounded-lg relative block aspect-[368/239]">
+      <Link href={`/user/destinations/destination-details/${destination.destinationId}`} className="rounded-lg relative block aspect-[368/239]">
         <Image
           src="/travel4K.jpg" // Replace with actual image source if available
           // alt={destinationName}
@@ -78,7 +78,7 @@ const DestinationItem = ({ destination }: { destination: Destination }) => {
       </Link>
       <div className="px-4">
         <h3 className="mb-3.5 mt-7.5 line-clamp-2 inline-block text-lg font-medium text-black duration-300 hover:text-primary dark:text-white dark:hover:text-primary xl:text-itemtitle2">
-          <Link href={`/destination/${destination.destinationID}`}>{destinationName}</Link>
+          <Link href={`/user/destinations/destination-details/${destination.destinationId}`}>{destinationName}</Link>
         </h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           {/* {address}, {district.name} */}

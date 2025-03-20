@@ -42,7 +42,7 @@
 // };
 
 export type Destination = {
-  destinationID?: string; // New API
+  destinationId?: string; // New API
   id?: string; // Old API
   destinationName?: string;
   name?: string; // Old API

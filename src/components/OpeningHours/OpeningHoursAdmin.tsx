@@ -255,13 +255,27 @@ const OpeningHours = () => {
                                 className="w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
                                 disabled={!!currentOpeningHour}
                             >
-                                <option>
+                                {/* {!!currentOpeningHour ? (
+                                <option value="">Select Day</option>
+                                (dayOfWeekOptions.map(day => (
+                                    <option key={day} value={day}>{day}</option>
+                                )))) : (
+                                    <option>
                                     {dayOfWeek}
                                 </option>
-                                {/* <option value="">Select Day</option>
-                                {dayOfWeekOptions.map(day => (
-                                    <option key={day} value={day}>{day}</option>
-                                ))} */}
+                                )} */}
+                                {currentOpeningHour ? (
+                                    <option>{dayOfWeek}</option>
+                                ) : (
+                                    <>
+                                        <option value="">Select Day</option>
+                                        {dayOfWeekOptions.map((day) => (
+                                            <option key={day} value={day}>
+                                                {day}
+                                            </option>
+                                        ))}
+                                    </>
+                                )}
                             </select>
                         </div>
 

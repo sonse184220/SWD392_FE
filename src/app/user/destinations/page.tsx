@@ -15,6 +15,7 @@ import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgres
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { ollamaSearch } from "@/services/ollamaAIService";
+import { saveData } from "@/lib/dbIndex";
 
 interface City {
     cityId: number;
@@ -174,12 +175,14 @@ const DestinationRecommendPage = () => {
 
             const searchData = promptParts.join(" ") + "."; // Final prompt
 
-            const response = await ollamaSearch(searchData);
+            // const response = await ollamaSearch(searchData);
+            const response = await getRecommendation(searchData);
             if (response.status === 200) {
                 // setDestinationList(response.data); // Update the list with fetched destinations
                 // Normalize data structure
-                const normalizedData = response.data.results.map((destination: any) => ({
-                    destinationID: destination.destinationID ?? destination.id,
+                // const normalizedData = response.data.results.map((destination: any) => ({
+                const normalizedData = response.data.response.map((destination: any) => ({
+                    destinationId: destination.destinationId ?? destination.id,
                     destinationName: destination.destinationName ?? destination.name,
                     address: destination.address,
                     description: destination.description,
@@ -193,6 +196,7 @@ const DestinationRecommendPage = () => {
                     closeTime: destination.closeTime
                 }));
                 setDestinationList(normalizedData);
+                saveData(normalizedData)
             }
         } catch (error) {
             console.error('Error fetching destinations:', error);
@@ -281,10 +285,11 @@ const DestinationRecommendPage = () => {
                                 ))}
                             </ul> */}
                             {/* Category Selection (Checkbox) */}
-                            <div className="mb-4 max-h-70 overflow-auto">
-                                <label className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1">
-                                    Select Categories
-                                </label>
+                            <label className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1">
+                                Select Categories
+                            </label>
+                            <div className="mb-4 max-h-50 overflow-y-auto">
+
                                 <FormGroup>
                                     {categories.map((category) => (
                                         <FormControlLabel
@@ -301,11 +306,12 @@ const DestinationRecommendPage = () => {
                                 </FormGroup>
                             </div>
 
+                            <label className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1">
+                                Select Subcategories
+                            </label>
                             {/* SubCategory Selection (Checkbox) */}
-                            <div className="mb-4">
-                                <label className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1">
-                                    Select Subcategories
-                                </label>
+                            <div className="mb-4 max-h-90 overflow-y-auto">
+
                                 <FormGroup>
                                     {filteredSubCategories.map((subCategory) => (
                                         <FormControlLabel
@@ -367,7 +373,7 @@ const DestinationRecommendPage = () => {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center justify-center text-center py-20">
+                                <div className="h-full w-full flex flex-col items-center justify-center text-center py-20">
                                     <img src="/noresult.png" alt="No results" className="w-48 h-48 mb-6 opacity-75" />
                                     <h3 className="text-xl font-semibold text-gray-800 dark:text-white">No destinations found</h3>
                                     <p className="text-gray-600 dark:text-gray-400 mt-2">

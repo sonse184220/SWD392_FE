@@ -95,7 +95,11 @@ export default function RootLayout({
       }
     }
 
-  }, [isAuthenticated, user, pathname, router, loading]);
+    if (!pathname.startsWith("/admin")) {
+      if (user?.role === "Admin") router.replace("/admin");
+    }
+
+  }, [isAuthenticated, user, pathname, router, loading, token]);
 
   return (
     <html lang="en">
