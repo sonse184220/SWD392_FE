@@ -41,15 +41,15 @@ async function handler(req: NextRequest) {
             Referer: "http://cityscouttravel.somee.com/",
         };
 
-        // let data = undefined;
-        // if (req.method !== "GET") {
-        //     const contentType = req.headers.get("content-type") || "";
-        //     if (contentType.includes("application/json")) {
-        //         data = await req.json(); // Parse JSON body
-        //     } else {
-        //         data = await req.text(); // Handle other data types (e.g., form-data)
-        //     }
-        // }
+        let data = undefined;
+        if (req.method !== "GET") {
+            const contentType = req.headers.get("content-type") || "";
+            if (contentType.includes("application/json")) {
+                data = await req.json(); // Parse JSON body
+            } else {
+                data = await req.text(); // Handle other data types (e.g., form-data)
+            }
+        }
 
         // Forward the original request method, headers, and body
         const response = await axios({
@@ -57,7 +57,7 @@ async function handler(req: NextRequest) {
             url: backendUrl,
             headers: headers,
             // data: req.body,
-            data: req.method !== "GET" ? await req.json() : undefined,
+            data: data,
             validateStatus: () => true, // Don't throw on error status codes
         });
 
