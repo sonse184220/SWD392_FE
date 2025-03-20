@@ -5,10 +5,20 @@ import { auth, provider, signInWithPopup, signOut } from "../../../firebaseAuth"
 import { User } from "firebase/auth";
 import { FaGoogle } from 'react-icons/fa';
 import { login } from '@/services/authService';
+import { useRouter, usePathname } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 
+interface DecodedToken {
+    nameid: string;
+    email: string;
+    unique_name: string;
+    role: string;
+}
 
 const Signin = () => {
-    let [isOpen, setIsOpen] = useState(false)
+    let [isOpen, setIsOpen] = useState(false);
+
+    const router = useRouter();
 
     const closeModal = () => {
         setIsOpen(false)
@@ -30,6 +40,10 @@ const Signin = () => {
                 sessionStorage.setItem("token", response.data.accessToken)
                 window.dispatchEvent(new Event("sessionUpdate"));
                 setIsOpen(false)
+
+                // const user = jwtDecode(response.data.accessToken) as DecodedToken
+                // console.log("decode", user)
+                // if (user.role === "Admin") router.push("/admin");
             }
         } catch (error) {
             console.error("Login Failed", error);

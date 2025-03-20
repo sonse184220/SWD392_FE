@@ -1,10 +1,11 @@
 "use client"
 import DefaultLayout from "@/components/Layouts/DefaultLayout"
+import React from "react";
 import { motion } from "framer-motion";
-import Category from "@/components/Category/Category";
-import SubCategoryComponent from "@/components/Category/SubCategory";
+import Destination from "@/components/Destination/DestinationAdmin";
+import OpeningHours from "@/components/OpeningHours/OpeningHoursAdmin";
 
-const CategoryPage: React.FC = () => {
+const DestinationPage: React.FC = () => {
     return (
         <DefaultLayout>
             {/* <div> */}
@@ -15,12 +16,12 @@ const CategoryPage: React.FC = () => {
                 className="p-6"
             >
                 <div>
-                    <h1 className="text-2xl font-semibold mb-4">Category Management</h1>
-                    <Category />
+                    <h1 className="text-2xl font-semibold mb-4">Destination Management</h1>
+                    <Destination />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-semibold mb-4">Sub Category Management</h1>
-                    <SubCategoryComponent />
+                    <h1 className="text-2xl font-semibold mb-4">Opening Hours Management</h1>
+                    <OpeningHours />
                 </div>
                 {/* </div> */}
             </motion.div>
@@ -28,4 +29,4 @@ const CategoryPage: React.FC = () => {
     );
 };
 
-export default CategoryPage;
+export default DestinationPage;
