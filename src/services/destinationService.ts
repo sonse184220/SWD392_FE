@@ -10,6 +10,9 @@ export async function addDestination(destination: { destinationName: string, add
     formData.append("destinationName", destination.destinationName);
     formData.append("address", destination.address);
     formData.append("description", destination.description);
+    formData.append("rate", destination.rate.toString());
+    formData.append("categoryId", destination.categoryId);
+    formData.append("districtId", destination.districtId);
     formData.append("status", destination.status);
     formData.append("ward", destination.ward);
     if (destination.imageFile) {

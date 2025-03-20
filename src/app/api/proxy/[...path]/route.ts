@@ -50,7 +50,7 @@ async function handler(req: NextRequest) {
                 if (contentType.includes("application/json")) {
                     data = await req.json(); // Parse JSON body
                 } else {
-                    data = await req.text(); // Handle other data types (e.g., form-data)
+                    data = req.body ? await req.text() : "{}"; // Handle other data types (e.g., form-data)
                 }
         }
 
