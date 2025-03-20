@@ -28,7 +28,7 @@ export async function updateDestination(destinationId: string, destination: { de
 }
 
 export async function deleteDestination(destinationId: string): Promise<AxiosResponse> {
-    return await axiosInstance.delete(`/api/Destination/${destinationId}`);
+    return await axiosInstance.delete(`/api/Destination/${destinationId}`, {});
 }
 
 export async function getDestinationById(destinationId: string): Promise<AxiosResponse> {
