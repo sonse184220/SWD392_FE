@@ -44,11 +44,14 @@ async function handler(req: NextRequest) {
         let data = undefined;
         if (req.method !== "GET") {
             const contentType = req.headers.get("content-type") || "";
-            if (contentType.includes("application/json")) {
-                data = await req.json(); // Parse JSON body
-            } else {
-                data = await req.text(); // Handle other data types (e.g., form-data)
-            }
+            if (contentType.includes("multipart/form-data")) {
+                data = await req.blob(); // Read raw body for form-data
+            } else
+                if (contentType.includes("application/json")) {
+                    data = await req.json(); // Parse JSON body
+                } else {
+                    data = await req.text(); // Handle other data types (e.g., form-data)
+                }
         }
 
         // Forward the original request method, headers, and body

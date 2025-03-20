@@ -15,7 +15,7 @@ export async function addDestination(destination: { destinationName: string, add
     if (destination.imageFile) {
         formData.append("imageFile", destination.imageFile);
     }
-    return await axiosInstance.post("/api/Destination", destination, {
+    return await axiosInstance.post("/api/Destination", formData, {
         headers: { "Content-Type": "multipart/form-data" }
     });
 }
