@@ -5,7 +5,7 @@ export async function getDestinationList(): Promise<AxiosResponse> {
     return await axiosInstance.get("/api/Destination");
 }
 
-export async function addDestination(destination: { destinationName: string, address: string, description: string, status: string, ward: string, imageFile?: File | null }): Promise<AxiosResponse> {
+export async function addDestination(destination: { destinationName: string, address: string, description: string, rate: number, categoryId: string, districtId: string, status: string, ward: string, imageFile?: File | null }): Promise<AxiosResponse> {
     const formData = new FormData();
     formData.append("destinationName", destination.destinationName);
     formData.append("address", destination.address);
