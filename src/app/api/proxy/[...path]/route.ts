@@ -23,25 +23,39 @@ async function handler(req: NextRequest) {
     try {
         // Get the actual API path from the URL
         // const path = req.query.path as string[];
-        const path = req.nextUrl.searchParams.getAll("path");
-        const apiPath = path.join('/');
+        const url = new URL(req.url);
+        let apiPath = url.pathname.replace(/^\/api\/proxy\//, ""); // Remove "/api/proxy"
 
         if (!apiPath) {
             return NextResponse.json({ error: "Invalid API path" }, { status: 400 });
         }
 
         // Reconstruct the full URL to the actual backend
-        const url = `http://cityscouttravel.somee.com/api/${apiPath}`;
+        const backendUrl = `http://cityscouttravel.somee.com/api/${apiPath}`;
+        console.log(`Forwarding request to: ${backendUrl}`);
+
+        const headers = {
+            ...Object.fromEntries(req.headers),
+            Host: "cityscouttravel.somee.com",
+            Origin: "http://cityscouttravel.somee.com",
+            Referer: "http://cityscouttravel.somee.com/",
+        };
+
+        // let data = undefined;
+        // if (req.method !== "GET") {
+        //     const contentType = req.headers.get("content-type") || "";
+        //     if (contentType.includes("application/json")) {
+        //         data = await req.json(); // Parse JSON body
+        //     } else {
+        //         data = await req.text(); // Handle other data types (e.g., form-data)
+        //     }
+        // }
 
         // Forward the original request method, headers, and body
         const response = await axios({
             method: req.method as string,
-            url: url,
-            headers: {
-                // ...req.headers,
-                ...Object.fromEntries(req.headers),
-                host: 'cityscouttravel.somee.com',
-            },
+            url: backendUrl,
+            headers: headers,
             // data: req.body,
             data: req.method !== "GET" ? await req.json() : undefined,
             validateStatus: () => true, // Don't throw on error status codes
@@ -52,7 +66,10 @@ async function handler(req: NextRequest) {
 
         // // Return the data
         // res.json(response.data);
-        return NextResponse.json(response.data, { status: response.status });
+        return new Response(JSON.stringify(response.data), {
+            status: response.status,
+            headers: new Headers(Object.entries(response.headers)),
+        });
     } catch (error) {
         console.error('Proxy error:', error);
         // res.status(500).json({ error: 'Error proxying request to backend' });
