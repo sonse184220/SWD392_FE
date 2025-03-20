@@ -26,6 +26,8 @@ type Destination = {
   category: any;
   district: any;
   openingHours: any[];
+  imageUrl?: string;
+  imageUrls?: string[];
 };
 
 type RecommendedDestination = {
@@ -34,6 +36,8 @@ type RecommendedDestination = {
   address: string;
   description: string;
   rate: number;
+  imageUrls?: string[];
+
 };
 
 type Category = {
@@ -190,7 +194,14 @@ const DestinationDetail = () => {
               <div className="relative aspect-[97/60] w-full sm:aspect-[97/44] fill">
                 <Image
                   // src="/travel4K.jpg"
-                  src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  src={
+                    destination.imageUrl
+                      ? destination.imageUrl
+                      : Array.isArray(destination.imageUrls) && destination.imageUrls.length > 0
+                        ? destination.imageUrls[0]
+                        : "/travel4K.jpg"
+                  }
+                  // src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   alt={destination.destinationName}
                   fill
                   className="rounded-md object-cover object-center"
@@ -268,8 +279,12 @@ const DestinationDetail = () => {
                     <div className="relative aspect-[16/9] w-full mb-4">
                       <Image
                         // src="/images/blog/blog-01.png" // placeholder image - update with actual image path
-                        src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-
+                        // src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        src={
+                          Array.isArray(rec.imageUrls) && rec.imageUrls.length > 0
+                            ? rec.imageUrls[0]
+                            : "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        }
                         alt={rec.destinationName}
                         fill
                         className="rounded-md object-cover object-center"

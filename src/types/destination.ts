@@ -56,6 +56,8 @@ export type Destination = {
   districtName?: string;
   openTime?: string;
   closeTime?: string;
+  imageUrl?: string;
+  imageUrls?: string[];
   district?: {
     districtId: number;
     name: string;

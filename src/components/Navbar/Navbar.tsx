@@ -27,7 +27,7 @@ const navigation: NavigationItem[] = [
     // { name: 'About', href: '#about', current: false },
     // { name: 'Project', href: '#project', current: false },
     { name: 'Places', href: '/user/destinations', current: false },
-    { name: 'AI Chat', href: '/cityAI', current: false },
+    { name: 'AI Chat', href: '/user/cityAI', current: false },
 ]
 
 function classNames(...classes: string[]) {

@@ -24,21 +24,6 @@ export default function AdminLayout({
     }, []);
 
     useEffect(() => {
-        // const className = "dark";
-        // const bodyClass = window.document.body.classList;
-        // bodyClass.add(className)
-
-        // return () => {
-        //     bodyClass.remove(className)
-        // }
-
-        // document.documentElement.classList.add("dark"); // Apply to <html>
-        // return () => {
-        //     document.documentElement.classList.remove("dark"); // Cleanup when leaving admin routes
-        // };
-    }, [])
-
-    useEffect(() => {
         if (pathname.startsWith("/admin")) {
             document.documentElement.classList.add("dark"); // ✅ Apply dark mode only for admin routes
         } else {
@@ -51,15 +36,6 @@ export default function AdminLayout({
     }, [pathname]);
 
     return (
-        // <html lang="en">
-        //     <body suppressHydrationWarning={true}>
-        //         {/* <Navbar /> */}
-        //         {/* {children} */}
-        //         <div className="dark:bg-boxdark-2 dark:text-bodydark">
-        //             {loading ? <Loader /> : children}
-        //         </div>
-        //     </body>
-        // </html>
         <div className="dark:bg-gray-900 dark:text-white min-h-screen">
             {loading ? <Loader /> : children}
         </div>

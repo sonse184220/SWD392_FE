@@ -70,8 +70,16 @@ const DestinationItem = ({ destination }: { destination: Destination }) => {
     >
       <Link href={`/user/destinations/destination-details/${destination.destinationId}`} className="rounded-lg relative block aspect-[368/239]">
         <Image
-          src="/travel4K.jpg" // Replace with actual image source if available
+          // src="/travel4K.jpg" // Replace with actual image source if available
           // alt={destinationName}
+          // src={destination.imageUrl ? destination.imageUrl : "/travel4K.jpg"}
+          src={
+            destination.imageUrl
+              ? destination.imageUrl
+              : Array.isArray(destination.imageUrls) && destination.imageUrls.length > 0
+                ? destination.imageUrls[0]
+                : "/travel4K.jpg"
+          }
           alt={destinationName || ""}
           fill
         />

@@ -175,13 +175,13 @@ const DestinationRecommendPage = () => {
 
             const searchData = promptParts.join(" ") + "."; // Final prompt
 
-            // const response = await ollamaSearch(searchData);
-            const response = await getRecommendation(searchData);
+            const response = await ollamaSearch(searchData);
+            // const response = await getRecommendation(searchData);
             if (response.status === 200) {
                 // setDestinationList(response.data); // Update the list with fetched destinations
                 // Normalize data structure
-                // const normalizedData = response.data.results.map((destination: any) => ({
-                const normalizedData = response.data.response.map((destination: any) => ({
+                const normalizedData = response.data.results.map((destination: any) => ({
+                    // const normalizedData = response.data.response.map((destination: any) => ({
                     destinationId: destination.destinationId ?? destination.id,
                     destinationName: destination.destinationName ?? destination.name,
                     address: destination.address,
@@ -196,7 +196,7 @@ const DestinationRecommendPage = () => {
                     closeTime: destination.closeTime
                 }));
                 setDestinationList(normalizedData);
-                saveData(normalizedData)
+                // saveData(normalizedData)
             }
         } catch (error) {
             console.error('Error fetching destinations:', error);
