@@ -34,7 +34,7 @@ if (isClient && isProduction) {
             config.url = config.url.replace(/^\/+/, "");
 
             // Ensure it's properly prefixed with "/api/proxy/"
-            config.url = `/api/proxy/${config.url}`;
+            // config.url = `/api/proxy/${config.url}`;
         }
         return config;
     });
