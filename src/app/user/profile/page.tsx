@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { getUserProfile, updateUserProfile } from "@/services/profileService";
 import React, { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
 interface UserProfile {
@@ -121,8 +121,11 @@ export default function Profile() {
         }
     };
 
-    if (!isAuthenticated && user?.role !== "User")
-        router.push("/");
+    if (!isAuthenticated && user?.role !== "User") {
+        // router.push("/");
+        return notFound();
+    }
+
 
     return (
         <div className='flex justify-center px-8 py-4 '>

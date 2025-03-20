@@ -3,21 +3,13 @@ import { axiosInstance } from "../../axiosInstance";
 
 interface DistrictData {
     name: string;
-    address: string;
     description: string;
-    rate: number;
-    categoryId: string;
-    ward: string;
-    status: string;
+    cityId: string;
     districtId?: string;
 }
 
 export async function getDistrictList(): Promise<AxiosResponse> {
-    const response = await axiosInstance.get(
-        "/api/District", {}
-    )
-
-    return response;
+    return await axiosInstance.get("/api/District");
 }
 
 export async function addDistrict(district: DistrictData): Promise<AxiosResponse> {
