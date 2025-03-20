@@ -25,9 +25,16 @@ export const axiosInstance = axios.create({
 if (isClient && isProduction) {
     axiosInstance.interceptors.request.use(config => {
         // Extract the actual API path if it starts with '/api/'
-        if (config.url?.startsWith('/api/')) {
-            // Remove '/api/proxy' from the path and prepend the original path
-            config.url = config.url.replace('/api/proxy', '');
+        // if (config.url?.startsWith('/api/')) {
+        //     // Remove '/api/proxy' from the path and prepend the original path
+        //     config.url = config.url.replace('/api/proxy', '');
+        // }
+        if (config.url) {
+            // Ensure path starts without a leading slash to prevent double slashes
+            config.url = config.url.replace(/^\/+/, "");
+
+            // Ensure it's properly prefixed with "/api/proxy/"
+            config.url = `/api/proxy/${config.url}`;
         }
         return config;
     });
