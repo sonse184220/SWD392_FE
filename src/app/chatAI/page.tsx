@@ -12,6 +12,8 @@ import { AiChatSuggestion } from "@/subframe/components/AiChatSuggestion";
 import { MODEL_TO_FRIENDLY_NAME, SUPPORTED_MODELS } from "../../model-helpers";
 import { axiosInstance } from "../../../axiosInstance";
 import { IoIosAttach } from "react-icons/io";
+import { getMessageChat } from "@/services/AI/getMessagesChat";
+
 // API function for sending messages to the backend
 async function sendMessage(messageContent: string) {
   try {
@@ -25,23 +27,31 @@ async function sendMessage(messageContent: string) {
 
 function AiChat() {
   const [model, setModel] = useState<SUPPORTED_MODELS>("gpt-4o-mini");
-  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [attachment, setAttachment] = useState<Attachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-
+  const [messages, setMessages] = useState<Message[]>([]);
   const USER_AVATAR = "tourists.jpg"; 
   const AI_AVATAR = "cityscoutlogo.jpg";
 
+  // Fetch initial messages from API
   useEffect(() => {
-    const welcomeMessage: Message = {
-      id: Date.now().toString(),
-      content: "Hello! I'm your AI assistant. How can I help you today?",
-      role: "assistant",
-    };
-    setMessages([welcomeMessage]);
+    async function fetchMessages() {
+      try {
+        const response = await getMessageChat();
+        const messagePairs = response.data.map((msg: { prompt: string; response: string }) => [
+          { role: "user", content: msg.prompt, id: Date.now().toString() + Math.random() },
+          { role: "assistant", content: msg.response, id: Date.now().toString() + Math.random() },
+        ]);
+        const fetchedMessages = messagePairs.reverse().flat(); // Đảo ngược các cặp, rồi làm phẳng
+        setMessages(fetchedMessages);
+      } catch (error) {
+        console.error("Lỗi khi lấy tin nhắn:", error);
+      }
+    }
+    fetchMessages();
   }, []);
 
   async function handleSendMessage() {
@@ -50,7 +60,6 @@ function AiChat() {
     try {
       setIsLoading(true);
       const messageContent = input;
-      console.log("Sending message:", messageContent);
       setInput("");
   
       const userMessage: Message = {
@@ -63,20 +72,17 @@ function AiChat() {
       setAttachment(null);
   
       const response = await sendMessage(messageContent);
-      console.log("API Response:", response.data);
+      const assistantContent = response.data.response || response.data.message || "No response received";
   
       const assistantMessage: Message = {
         id: Date.now().toString(),
-        content: response.data.response || response.data.message || "No response received",
+        content: assistantContent,
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
   
       if (chatContainerRef.current) {
-        const isAtBottom = chatContainerRef.current.scrollHeight - chatContainerRef.current.scrollTop === chatContainerRef.current.clientHeight;
-        if (isAtBottom) {
-          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
       }
     } catch (error) {
       console.error("Failed to send message:", error);
@@ -98,20 +104,17 @@ function AiChat() {
       setMessages((prev) => [...prev, userMessage]);
   
       const response = await sendMessage(content);
-      console.log("API Response from suggestion:", response.data);
+      const assistantContent = response.data.response || response.data.message || "No response received";
   
       const assistantMessage: Message = {
         id: Date.now().toString(),
-        content: response.data.response || response.data.message || "No response received",
+        content: assistantContent,
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
   
       if (chatContainerRef.current) {
-        const isAtBottom = chatContainerRef.current.scrollHeight - chatContainerRef.current.scrollTop === chatContainerRef.current.clientHeight;
-        if (isAtBottom) {
-          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
       }
     } catch (error) {
       console.error("Failed to handle suggestion:", error);
@@ -171,21 +174,21 @@ function AiChat() {
         </div>
       </div>
       <div className="flex w-full max-w-[1200px] mt-[15px] flex-col items-start">
-        {/* Chat container with fixed height and scroll */}
+        {/* Chat container */}
         <div
           ref={chatContainerRef}
           className="chat-container h-[calc(100vh-300px)] overflow-y-auto pb-4"
         >
           <div className="flex w-full flex-col items-start gap-6">
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <div
-                key={index}
+                key={message.id}
                 className={`message-wrapper ${message.role === "user" ? "user" : "assistant"}`}
               >
                 <AiChatSent
                   avatar={message.role === "user" ? USER_AVATAR : AI_AVATAR}
                   className={`message-content ${message.role === "user" ? "user" : "assistant"}`}
-                  onError={(e) => console.log(`Avatar failed to load for ${message.role}:`, e)} // Xử lý lỗi tải avatar
+                  onError={(e) => console.log(`Avatar failed to load for ${message.role}:`, e)}
                 >
                   <div className="flex flex-col gap-3">
                     <span className="grow shrink-0 basis-0 text-body font-body text-default-font">
@@ -197,7 +200,7 @@ function AiChat() {
                           className="h-12 w-12 flex-none object-cover rounded-md"
                           alt={message.experimental_attachments[0].name}
                           src={message.experimental_attachments[0].url}
-                          onError={(e) => console.log(`Attachment failed to load:`, e)} // Xử lý lỗi tải attachment
+                          onError={(e) => console.log(`Attachment failed to load:`, e)}
                         />
                       </div>
                     )}
@@ -219,115 +222,120 @@ function AiChat() {
                   </div>
                 </AiChatSent>
                 <AiChatSuggestion
-              text="Điểm du lịch nổi bật"
-              onClick={() =>
-                handleSuggestionClick(
-                  "Bạn có thể giới thiệu cho tôi một số điểm du lịch nổi bật ở Việt Nam không? Hãy gợi ý cả địa điểm thiên nhiên và văn hóa nhé!"
-                )
-              }
-            />
-            <AiChatSuggestion
-              text="Lịch trình du lịch 3 ngày"
-              onClick={() =>
-                handleSuggestionClick(
-                  "Tôi muốn lên lịch trình du lịch 3 ngày ở Việt Nam. Bạn có thể gợi ý những địa điểm đẹp, món ăn ngon và các hoạt động thú vị không?"
-                )
-              }
-            />
-            <AiChatSuggestion
-              text="Món ăn đường phố Việt Nam"
-              onClick={() =>
-                handleSuggestionClick(
-                  "Gợi ý cho tôi một số món ăn đường phố ngon nhất ở Việt Nam mà du khách không nên bỏ lỡ!"
-                )
-              }
-            />
-            <AiChatSuggestion
-              text="Bãi biển đẹp ở Việt Nam"
-              onClick={() =>
-                handleSuggestionClick(
-                  "Bạn có thể giới thiệu cho tôi một số bãi biển đẹp nhất ở Việt Nam không? Tôi muốn tìm nơi thư giãn và tận hưởng thiên nhiên."
-                )
-              }
-            />
-            <AiChatSuggestion
-              text="Trải nghiệm văn hóa Việt Nam"
-              onClick={() =>
-                handleSuggestionClick(
-                  "Tôi muốn tìm hiểu về văn hóa Việt Nam. Bạn có thể gợi ý những hoạt động hoặc lễ hội mà tôi nên tham gia không?"
-                )
-              }
-            />
-
+                  text="Điểm du lịch nổi bật"
+                  onClick={() =>
+                    handleSuggestionClick(
+                      "Bạn có thể giới thiệu cho tôi một số điểm du lịch nổi bật ở Việt Nam không? Hãy gợi ý cả địa điểm thiên nhiên và văn hóa nhé!"
+                    )
+                  }
+                />
+                <AiChatSuggestion
+                  text="Lịch trình du lịch 3 ngày"
+                  onClick={() =>
+                    handleSuggestionClick(
+                      "Tôi muốn lên lịch trình du lịch 3 ngày ở Việt Nam. Bạn có thể gợi ý những địa điểm đẹp, món ăn ngon và các hoạt động thú vị không?"
+                    )
+                  }
+                />
+                <AiChatSuggestion
+                  text="Món ăn đường phố Việt Nam"
+                  onClick={() =>
+                    handleSuggestionClick(
+                      "Gợi ý cho tôi một số món ăn đường phố ngon nhất ở Việt Nam mà du khách không nên bỏ lỡ!"
+                    )
+                  }
+                />
+                <AiChatSuggestion
+                  text="Bãi biển đẹp ở Việt Nam"
+                  onClick={() =>
+                    handleSuggestionClick(
+                      "Bạn có thể giới thiệu cho tôi một số bãi biển đẹp nhất ở Việt Nam không? Tôi muốn tìm nơi thư giãn và tận hưởng thiên nhiên."
+                    )
+                  }
+                />
+                <AiChatSuggestion
+                  text="Trải nghiệm văn hóa Việt Nam"
+                  onClick={() =>
+                    handleSuggestionClick(
+                      "Tôi muốn tìm hiểu về văn hóa Việt Nam. Bạn có thể gợi ý những hoạt động hoặc lễ hội mà tôi nên tham gia không?"
+                    )
+                  }
+                />
               </div>
             )}
           </div>
         </div>
-        <div className="w-full max-w-[1200px] mx-auto bg-white shadow-lg rounded-2xl p-3 mt-3">
-      {/* Attachment Preview */}
-      {attachment && (
-        <div className="flex items-center gap-3 p-2 bg-gray-100 rounded-lg mb-2 relative">
-          <img
-            src={attachment.url}
-            alt={attachment.name}
-            className="h-14 w-14 object-cover rounded-md"
-          />
-          <button
-            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 text-xs"
-            onClick={() => setAttachment(null)}
-          >
-           X
-          </button>
+        <div className="w-full max-w-[1200px] mx-auto bg-white shadow-lg rounded-2xl p-3 mt-3 mb-2">
+          {/* Attachment Preview */}
+          {attachment && (
+            <div className="flex items-center gap-3 p-2 bg-gray-100 rounded-lg mb-2 relative">
+              <img
+                src={attachment.url}
+                alt={attachment.name}
+                className="h-14 w-14 object-cover rounded-md"
+              />
+              <button
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 text-xs"
+                onClick={() => setAttachment(null)}
+              >
+                X
+              </button>
+            </div>
+          )}
+
+          {/* Chat Input & Button Container */}
+          <div className="flex items-center gap-4 bg-gray-100 rounded-full p-5">
+            {/* Input + Attachment Button */}
+            <div className="flex items-center flex-grow gap-3">
+              <button
+                className="text-gray-500 hover:text-gray-700"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <IoIosAttach size={24} />
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".png,.jpeg,.gif,.webp"
+                onChange={(event) => {
+                  if (!event.target.files) return;
+                  const file = event.target.files[0];
+                  const reader = new FileReader();
+                  reader.onload = (e) => {
+                    if (e.target?.result && typeof e.target.result === "string") {
+                      setAttachment({ name: file.name, url: e.target.result });
+                    }
+                  };
+                  reader.readAsDataURL(file);
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Chat with me..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                className="flex-grow bg-transparent outline-none text-gray-800 placeholder-gray-500"
+              />
+            </div>
+            {/* Send Button */}
+            <div>
+              <button
+                className="bg-blue-500 text-white px-6 py-2 rounded-full 
+                          hover:bg-blue-600 hover:shadow-lg hover:scale-105 
+                          transition-all duration-300 ease-in-out"
+                onClick={handleSendMessage}
+              >
+                Send
+              </button>
+            </div>
+          </div>
+
+          <p className="text-center text-sm text-gray-400 mt-2">
+            AI can make mistakes. Always double-check the source.
+          </p>
         </div>
-      )}
-
-      {/* Chat Input */}
-      <div className="flex items-center gap-3 bg-gray-100 rounded-full p-3">
-        <button
-          className="text-gray-500 hover:text-gray-700"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <IoIosAttach size={24} />
-        </button>
-        <input
-          type="file"
-          ref={fileInputRef}
-          className="hidden"
-          accept=".png,.jpeg,.gif,.webp"
-          onChange={(event) => {
-            if (!event.target.files) return;
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              if (e.target?.result && typeof e.target.result === "string") {
-                setAttachment({ name: file.name, url: e.target.result });
-              }
-            };
-            reader.readAsDataURL(file);
-          }}
-        />
-        <input
-          type="text"
-          placeholder="Chat with me..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-          className="flex-grow bg-transparent outline-none text-gray-800 placeholder-gray-500"
-        />
-        <button
-          className="bg-blue-500 text-white px-6 py-2 rounded-full 
-                    hover:bg-blue-600 hover:shadow-lg hover:scale-105 
-                    transition-all duration-300 ease-in-out"
-          onClick={handleSendMessage}
-        >
-          Send
-        </button>
-
-      </div>
-      <p className="text-center text-sm text-gray-400 mt-2">
-        AI can make mistakes. Always double-check the source.
-      </p>
-      </div>
       </div>
     </div>
   );
