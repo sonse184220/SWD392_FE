@@ -69,6 +69,13 @@ async function handler(req: NextRequest) {
 
         // // Return the data
         // res.json(response.data);
+        if (response.status === 204) {
+            return new Response(null, {
+                status: 204,
+                headers: new Headers(Object.entries(response.headers)),
+            });
+        }
+
         return new Response(JSON.stringify(response.data), {
             status: response.status,
             headers: new Headers(Object.entries(response.headers)),
