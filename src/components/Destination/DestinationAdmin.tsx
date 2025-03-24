@@ -3,9 +3,23 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import { addDestination, deleteDestination, getDestinationList, updateDestination } from "@/services/destinationService";
 import { getCategoryList } from "@/services/categoryService";
 import { getDistrictList } from "@/services/districtService";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
+import { toast } from "react-toastify";
+import { error } from "console";
+
+const ITEMS_PER_PAGE = 5; // Number of items per page
 
 interface Destination {
     destinationId: string;
@@ -46,12 +60,29 @@ interface District {
 // ];
 
 const Destination = () => {
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [destinations, setDestinations] = useState<Destination[]>([]);
+    const [filteredDestinations, setFilteredDestinations] = useState<Destination[]>([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const totalPages = Math.ceil(filteredDestinations.length / ITEMS_PER_PAGE);
+
+    // Get paginated items
+    const paginatedDestinations = filteredDestinations.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
     const [categories, setCategories] = useState<Category[]>([]);
     const [districts, setDistricts] = useState<District[]>([]);
 
     const [isOpen, setIsOpen] = useState(false);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [destinationToDelete, setDestinationToDelete] = useState<Destination | null>(null);
+
+
     const [currentDestination, setCurrentDestination] = useState<Destination | null>(null);
     const [destinationName, setDestinationName] = useState("");
     const [address, setAddress] = useState("");
@@ -72,6 +103,29 @@ const Destination = () => {
         fetchDistricts();
         setIsLoading(false);
     }, []);
+
+    useEffect(() => {
+        // Filter destinations whenever the search term changes
+        filterDestinations();
+    }, [searchTerm, destinations]);
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1); // Reset to first page when searching
+    };
+
+    const filterDestinations = () => {
+        if (!searchTerm.trim()) {
+            setFilteredDestinations(destinations);
+            return;
+        }
+
+        const filtered = destinations.filter(dest =>
+            dest.destinationName.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        setFilteredDestinations(filtered);
+    };
 
     const fetchCategories = async () => {
         try {
@@ -94,7 +148,10 @@ const Destination = () => {
     const fetchDestinations = async () => {
         try {
             const response = await getDestinationList();
-            if (response.status === 200) setDestinations(response.data);
+            if (response.status === 200) {
+                setDestinations(response.data);
+                setFilteredDestinations(destinations);
+            }
         } catch (error) {
             console.error("Error fetching destinations:", error);
         }
@@ -136,26 +193,86 @@ const Destination = () => {
 
     const handleSave = async () => {
         try {
+            if (!destinationName.trim()) {
+                toast.error("Destination name is required!");
+                return;
+            }
+            if (!address.trim()) {
+                toast.error("Address is required!");
+                return;
+            }
+            if (!description.trim()) {
+                toast.error("Description is required!");
+                return;
+            }
+            if (!categoryId) {
+                toast.error("Category is required!");
+                return;
+            }
+            if (!districtId) {
+                toast.error("District is required!");
+                return;
+            }
+            if (rate < 0 || rate > 5) {
+                toast.error("Rate must be between 0 and 5!");
+                return;
+            }
+            if (!ward.trim()) {
+                toast.error("Ward is required!");
+                return;
+            }
             const destinationData = { destinationName, address, description, rate, categoryId, districtId, status, ward, imageFile };
             if (!currentDestination) {
-                await addDestination(destinationData);
+                const response = await addDestination(destinationData);
+                if (response.status === 201) {
+                    setIsOpen(false);
+                    toast.success("Destination added successful!");
+                } else if (response.status === 500) {
+                    throw new Error("Failed to add destination");
+                }
             } else {
-                await updateDestination(currentDestination.destinationId, destinationData);
+                const response = await updateDestination(currentDestination.destinationId, destinationData);
+                if (response.status === 204) {
+                    setIsOpen(false);
+                    toast.success("Destination updated successful!");
+                } else if (response.status === 500) {
+                    throw new Error("Failed to add destination");
+                }
             }
-        } catch (error) {
-            console.error("Error saving destination:", error);
-        } finally {
             fetchDestinations();
-            setIsOpen(false);
+        } catch (error) {
+            toast.error("An error occurred. Please try again.");
+            console.error("Error saving destination:", error);
+        }
+        //  finally {
+        //     fetchDestinations();
+        //     setIsOpen(false);
+        // }
+    };
+
+    const handleDelete = async () => {
+        try {
+            if (!destinationToDelete) return;
+            await deleteDestination(destinationToDelete.destinationId);
+            toast.success("Destination deleted successfully!");
+            fetchDestinations();
+        } catch (error) {
+            toast.error("Error deleting destination!");
+            console.error("Error deleting destination:", error);
+        } finally {
+            setIsDeleteOpen(false);
+            setDestinationToDelete(null);
         }
     };
 
-    const handleDelete = async (id: string) => {
-        try {
-            await deleteDestination(id);
-            fetchDestinations();
-        } catch (error) {
-            console.error("Error deleting destination:", error);
+    const openConfirmDialog = (destination: Destination) => {
+        setDestinationToDelete(destination);
+        setIsDeleteOpen(true);
+    };
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
         }
     };
 
@@ -170,8 +287,19 @@ const Destination = () => {
                 <Button onClick={() => openDialog()} className="bg-blue-500 hover:bg-blue-600">
                     + Add Destination
                 </Button>
+                <div className="relative flex items-center w-64 m-2">
+                    <Search className="absolute left-2 text-gray-400" size={18} />
+                    <Input
+                        type="text"
+                        placeholder="Search by name..."
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        className="pl-8 pr-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
             </div>
-            <Table className="w-full border">
+
+            <Table className="w-full">
                 <TableHeader>
                     <TableRow className="bg-gray-200 dark:bg-gray-700">
                         {/* <TableHead className="border px-4 py-2">ID</TableHead> */}
@@ -185,7 +313,7 @@ const Destination = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {destinations.map((destination) => (
+                    {paginatedDestinations.map((destination) => (
                         <TableRow key={destination.destinationId}>
                             {/* <TableCell className="border px-4 py-2">{destination.destinationId}</TableCell> */}
                             <TableCell className="border px-4 py-2">{destination.destinationName}</TableCell>
@@ -198,7 +326,7 @@ const Destination = () => {
                                 <Button variant="outline" onClick={() => openDialog(destination)} className="mr-2">
                                     Edit
                                 </Button>
-                                <Button variant="destructive" onClick={() => handleDelete(destination.destinationId)}>
+                                <Button variant="destructive" onClick={() => openConfirmDialog(destination)}>
                                     Delete
                                 </Button>
                             </TableCell>
@@ -206,6 +334,33 @@ const Destination = () => {
                     ))}
                 </TableBody>
             </Table>
+            <div className="flex justify-center mt-4">
+                <Pagination>
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious href="#" onClick={() => handlePageChange(currentPage - 1)} />
+                        </PaginationItem>
+
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <PaginationItem key={index}>
+                                <PaginationLink
+                                    href="#"
+                                    isActive={index + 1 === currentPage}
+                                    onClick={() => handlePageChange(index + 1)}
+                                >
+                                    {index + 1}
+                                </PaginationLink>
+                            </PaginationItem>
+                        ))}
+
+                        {totalPages > 3 && <PaginationEllipsis />}
+
+                        <PaginationItem>
+                            <PaginationNext href="#" onClick={() => handlePageChange(currentPage + 1)} />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
+            </div>
 
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogContent className="max-h-100 overflow-y-auto">
@@ -257,6 +412,29 @@ const Destination = () => {
                     <DialogFooter>
                         <Button variant="secondary" onClick={() => setIsOpen(false)}>Cancel</Button>
                         <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-600">Save</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            Confirm Delete
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                        Are you sure you want to delete  <span className="font-bold">{destinationToDelete?.destinationName}</span>?
+                    </div>
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setIsDeleteOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleDelete}
+                        >
+                            Delete
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

@@ -129,7 +129,7 @@ const DestinationDetail = () => {
         }
 
         // Fetch recommended destinations
-        let promptParts: string[] = ["Recommend places"];
+        let promptParts: string[] = ["Recommend 3 places"];
 
         if (destinationData?.destinationName) {
           promptParts.push(`nearby and around ${destinationData.destinationName} locate at ${destinationData?.address} belong to ${destinationData?.ward} ward`);

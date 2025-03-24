@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Navbarin from "@/components/Navbar/index";
+import { usePathname } from "next/navigation";
 
 
 export default function UserLayout({
@@ -8,7 +9,9 @@ export default function UserLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const pathname = usePathname();
     const [isLogin, setIsLogin] = useState<boolean | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
     // useEffect(() => {
     //     // if (sessionStorage.getItem("token")) {
@@ -49,6 +52,14 @@ export default function UserLayout({
         };
     }, []);
 
+    useEffect(() => {
+        // ✅ Set loading true whenever route changes
+        setLoading(true);
+        const timeout = setTimeout(() => setLoading(false), 1000);
+
+        return () => clearTimeout(timeout); // Cleanup timeout on unmount
+    }, [pathname]);
+
 
     if (isLogin === null) return null;
 
@@ -58,7 +69,16 @@ export default function UserLayout({
         // <body suppressHydrationWarning={true}>
         <div>
             <Navbarin isLogin={isLogin} />
-            {children}
+            {/* {children} */}
+            {/* {loading ? <span className="loading loading-ring loading-xl"></span> : children} */}
+
+            {/* <span className="w-20 h-20 loading loading-ring"></span> */}
+            {loading ?
+                <div className="flex h-screen items-center justify-center bg-white">
+                    <span className="w-20 h-20 loading loading-ring"></span>
+                </div>
+                : children}
+
         </div>
         // </body>
         // </html>

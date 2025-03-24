@@ -1,61 +1,3 @@
-// import { useState } from "react";
-// import { Button } from "@/components/ui/button";
-// import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
-// const District = () => {
-//     const [districts, setDistricts] = useState<{ id: number; name: string }[]>(
-//         []
-//     );
-//     const [isOpen, setIsOpen] = useState(false);
-//     const [currentDistrict, setCurrentDistrict] = useState<{ id: number; name: string } | null>(null);
-
-//     const openDialog = (district?: { id: number; name: string }) => {
-//         setCurrentDistrict(district || { id: 0, name: "" });
-//         setIsOpen(true);
-//     };
-
-//     return (
-//         <div>
-//             {/* <Button onClick={() => openDialog()}>Add District</Button> */}
-//             <div className="mb-4">
-//                 <Button onClick={() => openDialog()} className="bg-blue-500 hover:bg-blue-600">
-//                     + Add District
-//                 </Button>
-//             </div>
-//             <Table>
-//                 <TableHeader>
-//                     <TableRow>
-//                         <TableHead>ID</TableHead>
-//                         <TableHead>Name</TableHead>
-//                         <TableHead>Actions</TableHead>
-//                     </TableRow>
-//                 </TableHeader>
-//                 <TableBody>
-//                     {districts.map((district) => (
-//                         <TableRow key={district.id}>
-//                             <TableCell>{district.id}</TableCell>
-//                             <TableCell>{district.name}</TableCell>
-//                             <TableCell>
-//                                 <Button onClick={() => openDialog(district)}>Edit</Button>
-//                             </TableCell>
-//                         </TableRow>
-//                     ))}
-//                 </TableBody>
-//             </Table>
-//             <Dialog open={isOpen} onOpenChange={setIsOpen}>
-//                 <DialogContent>
-//                     <DialogHeader>
-//                         <DialogTitle>{currentDistrict?.id ? "Edit District" : "Add District"}</DialogTitle>
-//                     </DialogHeader>
-//                     {/* Form Fields Here */}
-//                 </DialogContent>
-//             </Dialog>
-//         </div>
-//     );
-// };
-// export default District;
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -63,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { addDistrict, deleteDistrict, getDistrictList, updateDistrict } from "@/services/districtService";
 import { getCityList } from "@/services/cityService";
+import { toast } from "react-toastify";
 
 interface District {
     districtId?: string;
@@ -84,6 +27,9 @@ const District = () => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [cityId, setCityId] = useState("");
+
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchDistricts();
@@ -124,6 +70,20 @@ const District = () => {
     };
 
     const handleSave = async () => {
+        if (!name.trim()) {
+            toast.error("District name is required!");
+            return;
+        }
+
+        if (!description.trim()) {
+            toast.error("District description is required!");
+            return;
+        }
+        if (!cityId) {
+            toast.error("CityId is required!");
+            return;
+        }
+
         const districtData: District = { name, description, cityId };
 
         try {
@@ -139,12 +99,30 @@ const District = () => {
         }
     };
 
-    const handleDelete = async (id: string) => {
+    // const handleDelete = async (id: string) => {
+    //     try {
+    //         await deleteDistrict(id);
+    //         fetchDistricts();
+    //     } catch (error) {
+    //         console.error("Error deleting district:", error);
+    //     }
+    // };
+
+    const confirmDelete = (id?: string) => {
+        setDeleteId(id ?? null);
+        setIsConfirmOpen(true);
+    };
+
+    const handleDelete = async () => {
+        if (!deleteId) return;
         try {
-            await deleteDistrict(id);
+            await deleteDistrict(deleteId);
+            toast.success("District deleted successfully");
             fetchDistricts();
         } catch (error) {
-            console.error("Error deleting district:", error);
+            toast.error("Error deleting district");
+        } finally {
+            setIsConfirmOpen(false);
         }
     };
 
@@ -176,7 +154,7 @@ const District = () => {
                                 <Button variant="outline" onClick={() => openDialog(district)} className="mr-2">
                                     Edit
                                 </Button>
-                                <Button variant="destructive" onClick={() => handleDelete(district.districtId!)}>
+                                <Button variant="destructive" onClick={() => confirmDelete(district.districtId)}>
                                     Delete
                                 </Button>
                             </TableCell>
@@ -206,6 +184,23 @@ const District = () => {
                     <DialogFooter>
                         <Button variant="secondary" onClick={() => setIsOpen(false)}>Cancel</Button>
                         <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-600">Save</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Confirm Delete</DialogTitle>
+                    </DialogHeader>
+                    <p>Are you sure you want to delete this district?</p>
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setIsConfirmOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={handleDelete}>
+                            Delete
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
