@@ -1,7 +1,6 @@
 "use client";
 
 import { Attachment } from "@ai-sdk/ui-utils";
-// import { Message } from "ai";
 import React, { useRef, useState, useEffect } from "react";
 import * as SubframeCore from "@subframe/core";
 import { Button } from "@/subframe/components/Button";
@@ -59,14 +58,30 @@ function AiChat() {
     }
     fetchMessages();
   }, []);
-  
+
+  // Updated formatMessage to handle **bold** formatting
   const formatMessage = (message: string) => {
-    return message.split("\n").map((line, index) => (
-      <span key={index}>
-        {line}
-        <br />
-      </span>
-    ));
+    // Split the message by newlines
+    const lines = message.split("\n");
+    return lines.map((line, index) => {
+      // Handle **bold** formatting within each line
+      const parts = line.split(/(\*\*[^*]+\*\*)/g); // Split by **text**
+      const formattedLine = parts.map((part, partIndex) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          // Remove the ** markers and wrap the content in <strong>
+          const boldText = part.slice(2, -2);
+          return <strong key={partIndex}>{boldText}</strong>;
+        }
+        return part;
+      });
+
+      return (
+        <span key={index}>
+          {formattedLine}
+          <br />
+        </span>
+      );
+    });
   };
 
   async function handleSendMessage() {
@@ -79,7 +94,7 @@ function AiChat() {
   
       const userMessage: Message = {
         id: Date.now().toString(),
-        content: formatMessage(messageContent), // Áp dụng formatMessage ngay tại đây
+        content: formatMessage(messageContent),
         role: "user",
         ...(attachment ? { experimental_attachments: [attachment] } : {}),
       };
@@ -91,7 +106,7 @@ function AiChat() {
   
       const assistantMessage: Message = {
         id: Date.now().toString(),
-        content: formatMessage(assistantContent), // Áp dụng formatMessage cho phản hồi
+        content: formatMessage(assistantContent),
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
@@ -117,7 +132,7 @@ function AiChat() {
       setIsLoading(true);
       const userMessage: Message = { 
         id: Date.now().toString(), 
-        content: formatMessage(content), // Áp dụng formatMessage
+        content: formatMessage(content),
         role: "user" 
       };
       setMessages((prev) => [...prev, userMessage]);
@@ -127,7 +142,7 @@ function AiChat() {
   
       const assistantMessage: Message = {
         id: Date.now().toString(),
-        content: formatMessage(assistantContent), // Áp dụng formatMessage
+        content: formatMessage(assistantContent),
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
@@ -289,13 +304,10 @@ function AiChat() {
           </div>
         </div>
         <div className="w-full max-w-[1200px] mx-auto bg-white shadow-lg rounded-2xl p-3 mt-3 mb-2">
-          
-
           {/* Chat Input & Button Container */}
           <div className="flex items-center gap-4 bg-gray-100 rounded-full p-5">
             {/* Input + Attachment Button */}
             <div className="flex items-center flex-grow gap-3">
-  
               <input
                 type="file"
                 ref={fileInputRef}
