@@ -16,35 +16,6 @@ interface Account {
     profilePicture: string;
 }
 
-// Service functions for API calls
-// const getAccountList = async (): Promise<Account[]> => {
-//     const response = await fetch("/api/Admin/accounts");
-//     if (!response.ok) {
-//         throw new Error("Failed to fetch accounts");
-//     }
-//     return response.json();
-// };
-
-// const activateAccount = async (userId: string): Promise<string> => {
-//     const response = await fetch(`/api/Admin/activate/${userId}`, {
-//         method: "PUT",
-//     });
-//     if (!response.ok) {
-//         throw new Error("Failed to activate account");
-//     }
-//     return response.text();
-// };
-
-// const deactivateAccount = async (userId: string): Promise<string> => {
-//     const response = await fetch(`/api/Admin/deactivate/${userId}`, {
-//         method: "PUT",
-//     });
-//     if (!response.ok) {
-//         throw new Error("Failed to deactivate account");
-//     }
-//     return response.text();
-// };
-
 const UserManagement: React.FC = () => {
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [isOpen, setIsOpen] = useState<boolean>(false);
