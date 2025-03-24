@@ -126,6 +126,10 @@ export function useAuth() {
 
         refreshToken();
 
+        const handleSessionUpdate = () => {
+            refreshToken();
+        };
+
         // Listen for storage events (in case token is updated in another tab)
         const handleStorageChange = (e: StorageEvent) => {
             if (e.key === "token") {
@@ -133,8 +137,13 @@ export function useAuth() {
             }
         };
 
+        window.addEventListener("sessionUpdate", handleSessionUpdate);
         window.addEventListener("storage", handleStorageChange);
-        return () => window.removeEventListener("storage", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("sessionUpdate", handleSessionUpdate);
+            window.removeEventListener("storage", handleStorageChange);
+        };
     }, []);
 
     return {

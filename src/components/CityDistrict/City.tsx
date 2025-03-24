@@ -84,6 +84,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { addCity, deleteCity, getCityList, updateCity } from "@/services/cityService";
+import { toast } from "react-toastify";
 
 interface City {
     cityId: string;
@@ -97,6 +98,8 @@ const City = () => {
     const [currentCity, setCurrentCity] = useState<City | null>(null);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchCities();
@@ -108,6 +111,7 @@ const City = () => {
             if (response.status === 200)
                 setCities(response.data);
         } catch (error) {
+            toast.error("Error fetching cities");
             console.error("Error fetching cities:", error);
         }
     };
@@ -126,38 +130,55 @@ const City = () => {
     };
 
     const handleSave = async () => {
-        // const method = currentCity ? "PUT" : "POST";
-        // const endpoint = currentCity ? `/api/cities/${currentCity.cityId}` : "/api/cities";
         try {
-            // await fetch(endpoint, {
-            //     method,
-            //     headers: { "Content-Type": "application/json" },
-            //     body: JSON.stringify({ name, description }),
-            // });
+            if (!name.trim()) {
+                toast.error("City name is required!");
+                return;
+            }
+
+            if (!description.trim()) {
+                toast.error("City description is required!");
+                return;
+            }
+
             if (!currentCity) {
                 const response = await addCity({ name, description });
                 // if(response.status === 200 || response.status === 201)
+                toast.success("City created successfully");
+
             } else {
                 const response = await updateCity(currentCity.cityId, { name, description });
+                toast.success("City updated successfully");
             }
-            // fetchCities();
-            // setIsOpen(false);
-        } catch (error) {
-            console.error("Error saving city:", error);
-        } finally {
             fetchCities();
             setIsOpen(false);
+        } catch (error) {
+            console.error("Error saving city:", error);
+            toast.error("Error for handle city action.Please try again");
         }
+        //  finally {
+        //     fetchCities();
+        //     setIsOpen(false);
+        // }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async () => {
         try {
+            if (!deleteId) return;
             // await fetch(`/api/cities/${id}`, { method: "DELETE" });
-            const response = await deleteCity(id);
+            const response = await deleteCity(deleteId);
+            toast.success("City deleted successfully");
             fetchCities();
         } catch (error) {
             console.error("Error deleting city:", error);
+        } finally {
+            setIsConfirmOpen(false);
         }
+    };
+
+    const confirmDelete = (id: string) => {
+        setDeleteId(id);
+        setIsConfirmOpen(true);
     };
 
     return (
@@ -186,7 +207,7 @@ const City = () => {
                                 <Button variant="outline" onClick={() => openDialog(city)} className="mr-2">
                                     Edit
                                 </Button>
-                                <Button variant="destructive" onClick={() => handleDelete(city.cityId)}>
+                                <Button variant="destructive" onClick={() => confirmDelete(city.cityId)}>
                                     Delete
                                 </Button>
                             </TableCell>
@@ -213,6 +234,23 @@ const City = () => {
                         </Button>
                         <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-600">
                             Save
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Confirm Delete</DialogTitle>
+                    </DialogHeader>
+                    <p>Are you sure you want to delete this city?</p>
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setIsConfirmOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={handleDelete}>
+                            Delete
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -44,6 +44,8 @@ import Footer from "@/components/Footer/Footer";
 import { listenForNotifications } from "@/services/notificationService";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter, usePathname } from "next/navigation";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function RootLayout({
   children,
@@ -95,11 +97,16 @@ export default function RootLayout({
       }
     }
 
-  }, [isAuthenticated, user, pathname, router, loading]);
+    if (!pathname.startsWith("/admin")) {
+      if (user?.role === "Admin") router.replace("/admin");
+    }
+
+  }, [isAuthenticated, user, pathname, router, loading, token]);
 
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
+        <ToastContainer position="top-right" autoClose={3000} />
         {/* <Navbar /> */}
         {children}
         {/* <div className="dark:bg-boxdark-2 dark:text-bodydark">

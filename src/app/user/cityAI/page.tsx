@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import AiChat from "../chatAI/page";
+import AiChat from "../../chatAI/page"
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
+import { useAuth } from "@/hooks/useAuth";
+import { notFound } from "next/navigation";
 export default function CityPage() {
   const [selectedCity, setSelectedCity] = useState<string>("");
+  const { isAuthenticated, user, token } = useAuth();
 
   const images = [
     "/danang/phocohoian.webp",
@@ -16,6 +19,11 @@ export default function CityPage() {
     "/dalat/nuilangbiang.webp",
     "/quangninh/vinhhalong.webp"
   ];
+
+  if (!isAuthenticated && user?.role !== "User") {
+    // router.push("/");
+    return notFound();
+  }
 
   return (
     <>
