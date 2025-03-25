@@ -84,6 +84,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { addCity, deleteCity, getCityList, updateCity } from "@/services/cityService";
+import { toast } from "react-toastify";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface City {
     cityId: string;
@@ -91,12 +100,23 @@ interface City {
     description: string;
 }
 
+const ITEMS_PER_PAGE = 5; // Adjust as needed
+
 const City = () => {
     const [cities, setCities] = useState<City[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [currentCity, setCurrentCity] = useState<City | null>(null);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const totalPages = Math.ceil(cities.length / ITEMS_PER_PAGE);
+    const paginatedCities = cities.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
 
     useEffect(() => {
         fetchCities();
@@ -104,10 +124,12 @@ const City = () => {
 
     const fetchCities = async () => {
         try {
-            const response = await getCityList() // Adjust API endpoint
-            if (response.status === 200)
+            const response = await getCityList();
+            if (response.status === 200) {
                 setCities(response.data);
+            }
         } catch (error) {
+            toast.error("Error fetching cities");
             console.error("Error fetching cities:", error);
         }
     };
@@ -126,38 +148,66 @@ const City = () => {
     };
 
     const handleSave = async () => {
-        // const method = currentCity ? "PUT" : "POST";
-        // const endpoint = currentCity ? `/api/cities/${currentCity.cityId}` : "/api/cities";
         try {
-            // await fetch(endpoint, {
-            //     method,
-            //     headers: { "Content-Type": "application/json" },
-            //     body: JSON.stringify({ name, description }),
-            // });
+            if (!name.trim()) {
+                toast.error("City name is required!");
+                return;
+            }
+
+            if (!description.trim()) {
+                toast.error("City description is required!");
+                return;
+            }
+
             if (!currentCity) {
                 const response = await addCity({ name, description });
-                // if(response.status === 200 || response.status === 201)
+                toast.success("City created successfully");
             } else {
                 const response = await updateCity(currentCity.cityId, { name, description });
+                toast.success("City updated successfully");
             }
-            // fetchCities();
-            // setIsOpen(false);
-        } catch (error) {
-            console.error("Error saving city:", error);
-        } finally {
             fetchCities();
             setIsOpen(false);
+        } catch (error) {
+            console.error("Error saving city:", error);
+            toast.error("Error for handle city action. Please try again");
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async () => {
         try {
-            // await fetch(`/api/cities/${id}`, { method: "DELETE" });
-            const response = await deleteCity(id);
+            if (!deleteId) return;
+            const response = await deleteCity(deleteId);
+            toast.success("City deleted successfully");
             fetchCities();
         } catch (error) {
             console.error("Error deleting city:", error);
+            toast.error("Error deleting city. Please try again");
+        } finally {
+            setIsConfirmOpen(false);
+            setDeleteId(null);
         }
+    };
+
+    const confirmDelete = (id: string) => {
+        setDeleteId(id);
+        setIsConfirmOpen(true);
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePageClick = (page: number) => {
+        setCurrentPage(page);
     };
 
     return (
@@ -177,7 +227,7 @@ const City = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {cities.map((city) => (
+                    {paginatedCities.map((city) => (
                         <TableRow key={city.cityId}>
                             <TableCell className="border px-4 py-2">{city.cityId}</TableCell>
                             <TableCell className="border px-4 py-2">{city.name}</TableCell>
@@ -186,7 +236,7 @@ const City = () => {
                                 <Button variant="outline" onClick={() => openDialog(city)} className="mr-2">
                                     Edit
                                 </Button>
-                                <Button variant="destructive" onClick={() => handleDelete(city.cityId)}>
+                                <Button variant="destructive" onClick={() => confirmDelete(city.cityId)}>
                                     Delete
                                 </Button>
                             </TableCell>
@@ -195,17 +245,55 @@ const City = () => {
                 </TableBody>
             </Table>
 
+            {/* Pagination */}
+            {cities.length > 0 && (
+                <Pagination className="mt-4">
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious 
+                                onClick={handlePrevious}
+                                className={`cursor-pointer ${currentPage === 1 ? 'opacity-50 pointer-events-none' : ''}`}
+                            />
+                        </PaginationItem>
+
+                        {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                            <PaginationItem key={page}>
+                                <PaginationLink
+                                    onClick={() => handlePageClick(page)}
+                                    isActive={currentPage === page}
+                                    className="cursor-pointer"
+                                >
+                                    {page}
+                                </PaginationLink>
+                            </PaginationItem>
+                        ))}
+
+                        <PaginationItem>
+                            <PaginationNext 
+                                onClick={handleNext}
+                                className={`cursor-pointer ${currentPage === totalPages ? 'opacity-50 pointer-events-none' : ''}`}
+                            />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
+            )}
+
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>{currentCity ? "Edit City" : "Add City"}</DialogTitle>
                     </DialogHeader>
-                    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter city name"
+                    <Input 
+                        value={name} 
+                        onChange={(e) => setName(e.target.value)} 
+                        placeholder="Enter city name"
                         className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
                     />
-                    <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Enter description"
+                    <Input 
+                        value={description} 
+                        onChange={(e) => setDescription(e.target.value)} 
+                        placeholder="Enter description"
                         className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-
                     />
                     <DialogFooter>
                         <Button variant="secondary" onClick={() => setIsOpen(false)}>
@@ -213,6 +301,23 @@ const City = () => {
                         </Button>
                         <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-600">
                             Save
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Confirm Delete</DialogTitle>
+                    </DialogHeader>
+                    <p>Are you sure you want to delete this city?</p>
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setIsConfirmOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={handleDelete}>
+                            Delete
                         </Button>
                     </DialogFooter>
                 </DialogContent>

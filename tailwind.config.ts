@@ -577,6 +577,9 @@ const config: Config = {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"), // ✅ Add all plugins in a single array
+		require("daisyui"),
+	],
 };
 export default config;

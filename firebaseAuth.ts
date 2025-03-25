@@ -2,13 +2,14 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAn4UGnQBkY0jhssiu_BFG5KbwVTjAYTxk",
-    authDomain: "swd392-fe.firebaseapp.com",
-    projectId: "swd392-fe",
-    storageBucket: "swd392-fe.firebasestorage.app",
-    messagingSenderId: "1080828748921",
-    appId: "1:1080828748921:web:61c627f87b6616095560a8",
-    measurementId: "G-389Q3KLJ2C"
+    apiKey: "AIzaSyBFgghl1sPBNEUrRmOh-A0Ek1P_F_rs-LE",
+    authDomain: "swd392cityscout.firebaseapp.com",
+    databaseURL: "https://swd392cityscout-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "swd392cityscout",
+    storageBucket: "swd392cityscout.firebasestorage.app",
+    messagingSenderId: "229306504531",
+    appId: "1:229306504531:web:22f5c52b0bfed885293da6",
+    measurementId: "G-03MN2GJFH3"
 };
 
 const app = initializeApp(firebaseConfig);
