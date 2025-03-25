@@ -6,6 +6,14 @@ import { Input } from "@/components/ui/input";
 import { addDistrict, deleteDistrict, getDistrictList, updateDistrict } from "@/services/districtService";
 import { getCityList } from "@/services/cityService";
 import { toast } from "react-toastify";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface District {
     districtId?: string;
@@ -19,6 +27,8 @@ interface City {
     name: string;
 }
 
+const ITEMS_PER_PAGE = 5; // Adjust as needed
+
 const District = () => {
     const [districts, setDistricts] = useState<District[]>([]);
     const [cities, setCities] = useState<City[]>([]);
@@ -27,9 +37,15 @@ const District = () => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [cityId, setCityId] = useState("");
-
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const totalPages = Math.ceil(districts.length / ITEMS_PER_PAGE);
+    const paginatedDistricts = districts.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
 
     useEffect(() => {
         fetchDistricts();
@@ -42,6 +58,7 @@ const District = () => {
             if (response.status === 200) setDistricts(response.data);
         } catch (error) {
             console.error("Error fetching districts:", error);
+            toast.error("Error fetching districts");
         }
     };
 
@@ -51,6 +68,7 @@ const District = () => {
             if (response.status === 200) setCities(response.data);
         } catch (error) {
             console.error("Error fetching cities:", error);
+            toast.error("Error fetching cities");
         }
     };
 
@@ -89,24 +107,18 @@ const District = () => {
         try {
             if (currentDistrict?.districtId) {
                 await updateDistrict(currentDistrict.districtId, districtData);
+                toast.success("District updated successfully");
             } else {
                 await addDistrict(districtData);
+                toast.success("District created successfully");
             }
             fetchDistricts();
             setIsOpen(false);
         } catch (error) {
             console.error("Error saving district:", error);
+            toast.error("Error saving district");
         }
     };
-
-    // const handleDelete = async (id: string) => {
-    //     try {
-    //         await deleteDistrict(id);
-    //         fetchDistricts();
-    //     } catch (error) {
-    //         console.error("Error deleting district:", error);
-    //     }
-    // };
 
     const confirmDelete = (id?: string) => {
         setDeleteId(id ?? null);
@@ -123,7 +135,24 @@ const District = () => {
             toast.error("Error deleting district");
         } finally {
             setIsConfirmOpen(false);
+            setDeleteId(null);
         }
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePageClick = (page: number) => {
+        setCurrentPage(page);
     };
 
     return (
@@ -139,17 +168,19 @@ const District = () => {
                         <TableHead className="border px-4 py-2">ID</TableHead>
                         <TableHead className="border px-4 py-2">Name</TableHead>
                         <TableHead className="border px-4 py-2">Description</TableHead>
-                        <TableHead className="border px-4 py-2">City ID</TableHead>
+                        <TableHead className="border px-4 py-2">City</TableHead>
                         <TableHead className="border px-4 py-2">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {districts.map((district) => (
+                    {paginatedDistricts.map((district) => (
                         <TableRow key={district.districtId}>
                             <TableCell className="border px-4 py-2">{district.districtId}</TableCell>
                             <TableCell className="border px-4 py-2">{district.name}</TableCell>
                             <TableCell className="border px-4 py-2">{district.description}</TableCell>
-                            <TableCell className="border px-4 py-2">{district.cityId}</TableCell>
+                            <TableCell className="border px-4 py-2">
+                                {cities.find(city => city.cityId === district.cityId)?.name || district.cityId}
+                            </TableCell>
                             <TableCell className="border px-4 py-2">
                                 <Button variant="outline" onClick={() => openDialog(district)} className="mr-2">
                                     Edit
@@ -163,22 +194,66 @@ const District = () => {
                 </TableBody>
             </Table>
 
+            {/* Pagination */}
+            {districts.length > 0 && (
+                <Pagination className="mt-4">
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious 
+                                onClick={handlePrevious}
+                                className={`cursor-pointer ${currentPage === 1 ? 'opacity-50 pointer-events-none' : ''}`}
+                            />
+                        </PaginationItem>
+
+                        {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                            <PaginationItem key={page}>
+                                <PaginationLink
+                                    onClick={() => handlePageClick(page)}
+                                    isActive={currentPage === page}
+                                    className="cursor-pointer"
+                                >
+                                    {page}
+                                </PaginationLink>
+                            </PaginationItem>
+                        ))}
+
+                        <PaginationItem>
+                            <PaginationNext 
+                                onClick={handleNext}
+                                className={`cursor-pointer ${currentPage === totalPages ? 'opacity-50 pointer-events-none' : ''}`}
+                            />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
+            )}
+
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>{currentDistrict ? "Edit District" : "Add District"}</DialogTitle>
                     </DialogHeader>
-                    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter name"
-                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" />
-                    <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Enter description"
-                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" />
-                    {/* <Input value={cityId} onChange={(e) => setCityId(e.target.value)} placeholder="Enter city ID"
-                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" /> */}
-                    <select value={cityId} onChange={(e) => setCityId(e.target.value)} className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none">
+                    <Input 
+                        value={name} 
+                        onChange={(e) => setName(e.target.value)} 
+                        placeholder="Enter name"
+                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" 
+                    />
+                    <Input 
+                        value={description} 
+                        onChange={(e) => setDescription(e.target.value)} 
+                        placeholder="Enter description"
+                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none" 
+                    />
+                    <select 
+                        value={cityId} 
+                        onChange={(e) => setCityId(e.target.value)} 
+                        className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                    >
                         <option value="">Select City</option>
                         {cities.map(city => (
-                            <option key={city.cityId} value={city.cityId}
-                                className="mt-4 w-full rounded-md border border-gray-600 bg-gray-800 p-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none">{city.name}</option>
+                            <option key={city.cityId} value={city.cityId}>
+                                {city.name}
+                            </option>
                         ))}
                     </select>
                     <DialogFooter>

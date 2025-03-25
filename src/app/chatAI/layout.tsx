@@ -15,7 +15,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Thêm các meta tags hoặc script nếu cần */}
       </head>
       <body className="flex flex-col min-h-screen">
         {children}
