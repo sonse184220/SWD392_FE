@@ -1,7 +1,6 @@
 "use client";
 
 import { Attachment } from "@ai-sdk/ui-utils";
-import { Message } from "ai";
 import React, { useRef, useState, useEffect } from "react";
 import * as SubframeCore from "@subframe/core";
 import { Button } from "@/subframe/components/Button";
@@ -25,6 +24,13 @@ async function sendMessage(messageContent: string) {
   }
 }
 
+interface Message {
+  id: string;
+  content: string | JSX.Element[]; // Hỗ trợ cả chuỗi và mảng JSX
+  role: "user" | "assistant";
+  experimental_attachments?: Attachment[];
+}
+
 function AiChat() {
   const [model, setModel] = useState<SUPPORTED_MODELS>("gpt-4o-mini");
   const [input, setInput] = useState("");
@@ -36,16 +42,15 @@ function AiChat() {
   const USER_AVATAR = "tourists.jpg"; 
   const AI_AVATAR = "cityscoutlogo.jpg";
 
-  // Fetch initial messages from API
   useEffect(() => {
     async function fetchMessages() {
       try {
         const response = await getMessageChat();
         const messagePairs = response.data.map((msg: { prompt: string; response: string }) => [
-          { role: "user", content: msg.prompt, id: Date.now().toString() + Math.random() },
-          { role: "assistant", content: msg.response, id: Date.now().toString() + Math.random() },
+          { role: "user", content: formatMessage(msg.prompt), id: Date.now().toString() + Math.random() },
+          { role: "assistant", content: formatMessage(msg.response), id: Date.now().toString() + Math.random() },
         ]);
-        const fetchedMessages = messagePairs.reverse().flat(); // Đảo ngược các cặp, rồi làm phẳng
+        const fetchedMessages = messagePairs.reverse().flat();
         setMessages(fetchedMessages);
       } catch (error) {
         console.error("Lỗi khi lấy tin nhắn:", error);
@@ -53,6 +58,31 @@ function AiChat() {
     }
     fetchMessages();
   }, []);
+
+  // Updated formatMessage to handle **bold** formatting
+  const formatMessage = (message: string) => {
+    // Split the message by newlines
+    const lines = message.split("\n");
+    return lines.map((line, index) => {
+      // Handle **bold** formatting within each line
+      const parts = line.split(/(\*\*[^*]+\*\*)/g); // Split by **text**
+      const formattedLine = parts.map((part, partIndex) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          // Remove the ** markers and wrap the content in <strong>
+          const boldText = part.slice(2, -2);
+          return <strong key={partIndex}>{boldText}</strong>;
+        }
+        return part;
+      });
+
+      return (
+        <span key={index}>
+          {formattedLine}
+          <br />
+        </span>
+      );
+    });
+  };
 
   async function handleSendMessage() {
     if (!input.trim()) return;
@@ -64,7 +94,7 @@ function AiChat() {
   
       const userMessage: Message = {
         id: Date.now().toString(),
-        content: messageContent,
+        content: formatMessage(messageContent),
         role: "user",
         ...(attachment ? { experimental_attachments: [attachment] } : {}),
       };
@@ -76,7 +106,7 @@ function AiChat() {
   
       const assistantMessage: Message = {
         id: Date.now().toString(),
-        content: assistantContent,
+        content: formatMessage(assistantContent),
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
@@ -88,7 +118,7 @@ function AiChat() {
       console.error("Failed to send message:", error);
       const errorMessage: Message = {
         id: Date.now().toString(),
-        content: "Sorry, there was an error processing your request. Please try again.",
+        content: formatMessage("Sorry, there was an error processing your request. Please try again."),
         role: "assistant",
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -100,7 +130,11 @@ function AiChat() {
   async function handleSuggestionClick(content: string) {
     try {
       setIsLoading(true);
-      const userMessage: Message = { id: Date.now().toString(), content, role: "user" };
+      const userMessage: Message = { 
+        id: Date.now().toString(), 
+        content: formatMessage(content),
+        role: "user" 
+      };
       setMessages((prev) => [...prev, userMessage]);
   
       const response = await sendMessage(content);
@@ -108,7 +142,7 @@ function AiChat() {
   
       const assistantMessage: Message = {
         id: Date.now().toString(),
-        content: assistantContent,
+        content: formatMessage(assistantContent),
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
@@ -120,7 +154,11 @@ function AiChat() {
       console.error("Failed to handle suggestion:", error);
       setMessages((prev) => [
         ...prev,
-        { id: Date.now().toString(), content: "Error processing suggestion.", role: "assistant" },
+        { 
+          id: Date.now().toString(), 
+          content: formatMessage("Error processing suggestion."), 
+          role: "assistant" 
+        },
       ]);
     } finally {
       setIsLoading(false);
@@ -266,33 +304,10 @@ function AiChat() {
           </div>
         </div>
         <div className="w-full max-w-[1200px] mx-auto bg-white shadow-lg rounded-2xl p-3 mt-3 mb-2">
-          {/* Attachment Preview */}
-          {attachment && (
-            <div className="flex items-center gap-3 p-2 bg-gray-100 rounded-lg mb-2 relative">
-              <img
-                src={attachment.url}
-                alt={attachment.name}
-                className="h-14 w-14 object-cover rounded-md"
-              />
-              <button
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 text-xs"
-                onClick={() => setAttachment(null)}
-              >
-                X
-              </button>
-            </div>
-          )}
-
           {/* Chat Input & Button Container */}
           <div className="flex items-center gap-4 bg-gray-100 rounded-full p-5">
             {/* Input + Attachment Button */}
             <div className="flex items-center flex-grow gap-3">
-              <button
-                className="text-gray-500 hover:text-gray-700"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <IoIosAttach size={24} />
-              </button>
               <input
                 type="file"
                 ref={fileInputRef}
