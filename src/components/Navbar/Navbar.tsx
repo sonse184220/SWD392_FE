@@ -28,6 +28,7 @@ const navigation: NavigationItem[] = [
     // { name: 'Project', href: '#project', current: false },
     { name: 'Places', href: '/user/destinations', current: false },
     { name: 'AI Chat', href: '/user/cityAI', current: false },
+    { name: 'Cultural', href: '/user/places-information', current: false },
 ]
 
 function classNames(...classes: string[]) {
@@ -130,26 +131,6 @@ const Navbar: React.FC<Props> = ({ isLogin }) => {
                                                             className={`block px-4 py-2 text-sm text-gray-700 ${active ? 'bg-gray-100 text-gray-900' : ''}`}
                                                         >
                                                             Account settings
-                                                        </a>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <a
-                                                            href="#"
-                                                            className={`block px-4 py-2 text-sm text-gray-700 ${active ? 'bg-gray-100 text-gray-900' : ''}`}
-                                                        >
-                                                            Support
-                                                        </a>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <a
-                                                            href="#"
-                                                            className={`block px-4 py-2 text-sm text-gray-700 ${active ? 'bg-gray-100 text-gray-900' : ''}`}
-                                                        >
-                                                            License
                                                         </a>
                                                     )}
                                                 </Menu.Item>

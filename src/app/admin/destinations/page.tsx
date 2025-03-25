@@ -19,10 +19,10 @@ const DestinationPage: React.FC = () => {
                     <h1 className="text-2xl font-semibold mb-4">Destination Management</h1>
                     <Destination />
                 </div>
-                <div>
+                {/* <div>
                     <h1 className="text-2xl font-semibold mb-4">Opening Hours Management</h1>
                     <OpeningHours />
-                </div>
+                </div> */}
                 {/* </div> */}
             </motion.div>
         </DefaultLayout >
