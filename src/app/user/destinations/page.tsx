@@ -218,11 +218,9 @@ const DestinationRecommendPage = () => {
                     {/* <!-- Section Title Start --> */}
                     <SectionHeader
                         headerInfo={{
-                            title: "SOLID FEATURES",
-                            subtitle: "Core Features of Solid",
-                            description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
-            convallis tortor eros. Donec vitae tortor lacus. Phasellus aliquam
-            ante in maximus.`,
+                            title: "Discover & Experience the Best of Every Destination",
+                            subtitle: "Your Personalized Guide to Unforgettable Journeys",
+                            description: `CityScout is your AI-powered travel companion, helping you explore vibrant cultures, iconic landmarks, and hidden gems. Whether you're looking for must-visit attractions, cultural experiences, or upcoming events, we provide personalized recommendations to make your journey unforgettable.`,
                         }}
                     />
                     {/* <!-- Section Title End --> */}

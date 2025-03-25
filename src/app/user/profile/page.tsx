@@ -8,6 +8,7 @@ import React, { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { notFound, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import Unauthorized from "@/app/reusePages/unauthorized";
 
 interface UserProfile {
     userId: string;
@@ -123,12 +124,12 @@ export default function Profile() {
 
     if (!isAuthenticated && user?.role !== "User") {
         // router.push("/");
-        return notFound();
+        return <Unauthorized />;
     }
 
 
     return (
-        <div className='flex justify-center px-8 py-4 '>
+        <div className='flex justify-center px-8 py-4 h-screen'>
             <form className='w-3/4'>
                 <div className="space-y-12">
                     <div className="border-b border-gray-900/10 pb-12">

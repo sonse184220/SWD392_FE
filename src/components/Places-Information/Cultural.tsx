@@ -6,42 +6,9 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { saveData } from "@/lib/dbIndex";
+import Link from "next/link";
 
-const featuresTabData: FeatureTab[] = [
-    {
-        id: "tabOne",
-        title: "Solid Has Neat & Clean User Interface.",
-        desc1: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies lacus non fermentum ultrices. Fusce consectetur le.`,
-        desc2: `    Nam id eleifend dui, id iaculis purus. Etiam lobortis neque nec finibus sagittis. Nulla ligula nunc egestas ut.`,
-        image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        imageDark: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-        id: "tabTwo",
-        title: "Ready to Use Pages You Need for a SaaS Business.",
-        desc1: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies lacus non fermentum ultrices. Fusce consectetur le.`,
-        desc2: `    Nam id eleifend dui, id iaculis purus. Etiam lobortis neque nec finibus sagittis. Nulla ligula nunc egestas ut.`,
-        image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        imageDark: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-        id: "tabThree",
-        title: "Functional Blog, DB, Auth and Many More",
-        desc1: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies lacus non fermentum ultrices. Fusce consectetur le.`,
-        desc2: `Nam id eleifend dui, id iaculis purus. Etiam lobortis neque nec finibus sagittis. Nulla ligula nunc egestas ut.`,
-        image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        imageDark: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-];
-
-type FeatureTab = {
-    id: string;
-    title: string;
-    desc1: string;
-    desc2: string;
-    image: string;
-    imageDark: string;
-};
 
 type CulturalData = {
     events: string[];
@@ -157,14 +124,6 @@ const Cultural: React.FC = () => {
         ? districts.filter(d => d.cityId === selectedCity.cityId)
         : [];
 
-    // const fetchDatas = async () => {
-    //     const response = await getRecommendation("1 place in ThuDuc");
-    //     setData({
-    //         events: response.data.events || [],
-    //         cultural: response.data.cultural || { places: [] },
-    //     });
-    // }
-
     const handleTabChange = (tabId: string) => {
         const selectedCityForTab = cityTabs.find(tab => tab.id === tabId) || cityTabs[0];
 
@@ -177,15 +136,6 @@ const Cultural: React.FC = () => {
 
     const handleSearch = async () => {
         try {
-            // setIsLoading(true);
-            // setProgress(0);
-
-            // let progressInterval = setInterval(() => {
-            //     setProgress((prev) => (prev < 90 ? prev + 10 : prev));
-            // }, 500);
-
-            // const cityName = cityTabs.find(tab => tab.cityId === cityId)?.name ?? "Unknown City";
-            // const prompt = `Recommend places in ${cityName}.`;
 
             if (!selectedCity) {
                 alert("Please select a city.");
@@ -200,8 +150,6 @@ const Cultural: React.FC = () => {
             const prompt = `List 3 places with related events and cultural to visit in ${cityName}, ${districtName}.`;
             const response = await getRecommendation(prompt);
             console.log("ne" + Date.now.toString + response)
-
-            // clearInterval(progressInterval);
 
             if (response.status === 200 && response.data.response) {
                 setDestinationList(
@@ -219,31 +167,15 @@ const Cultural: React.FC = () => {
                         }
                     }))
                 );
+
+                await saveData(response.data.response);
             }
         } catch (error) {
             console.error("Error fetching destinations:", error);
         } finally {
             setIsLoading(false);
-            // setProgress(100);
-            // setTimeout(() => {
-            //     setLoading(false);
-            //     setProgress(0);
-            // }, 500);
         }
     };
-
-
-    // useEffect(() => {
-    //     const selectedCity = cityTabs.find(tab => tab.id === currentTab)?.cityId ?? 1;
-
-    //     if (firstRender) {
-    //         setFirstRender(false); // ✅ Prevent duplicate API call
-    //         return;
-    //     }
-    //     console.log("called" + Date.now)
-
-    //     handleSearch(selectedCity);
-    // }, [currentTab]);
 
     return (
         <>
@@ -349,49 +281,56 @@ const Cultural: React.FC = () => {
                             ) : hasSearched ? (
                                 destinationList.length > 0 ? (
                                     destinationList.map((destination) => (
-                                        <div className="flex space-x-10" key={destination.destinationId}>
+                                        <div className="flex justify-center space-x-10" key={destination.destinationId}>
                                             {/* Destination Info */}
                                             <div className="w-1/3 mb-6 p-4 border rounded-lg shadow-md dark:border-strokedark">
-                                                <h3
-                                                    //  className="text-xl font-semibold"
-                                                    className="mb-7 text-3xl font-bold text-black dark:text-white xl:text-sectiontitle2"
-                                                >{destination.name}</h3>
-                                                <p className="text-sm text-gray-600 dark:text-gray-400">{destination.address}</p>
-                                                <p className="mt-2 text-gray-700 dark:text-gray-300">{destination.description}</p>
-                                                {/* {destination.imageUrls.length > 0 && ( */}
-                                                <Image
-                                                    // src={destination.imageUrls[0]}
+                                                <Link href={`/user/destinations/destination-details/${destination.destinationId}`}>
 
-                                                    src={
-                                                        destination.imageUrl
-                                                            ? destination.imageUrl
-                                                            : Array.isArray(destination.imageUrls) && destination.imageUrls.length > 0
-                                                                ? destination.imageUrls[0]
-                                                                : "/travel4K.jpg"
-                                                    } alt={destination.name}
-                                                    width={500}
-                                                    height={300}
-                                                    className="mt-4 rounded-lg"
-                                                />
-                                                {/* )} */}
+                                                    <h3
+                                                        //  className="text-xl font-semibold"
+                                                        className="mb-7 text-3xl font-bold text-black dark:text-white xl:text-sectiontitle2"
+                                                    >{destination.name}</h3>
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400">{destination.address}</p>
+                                                    <p className="mt-2 text-gray-700 dark:text-gray-300">{destination.description}</p>
+                                                    {/* {destination.imageUrls.length > 0 && ( */}
+                                                    <Image
+                                                        // src={destination.imageUrls[0]}
+
+                                                        src={
+                                                            destination.imageUrl
+                                                                ? destination.imageUrl
+                                                                : Array.isArray(destination.imageUrls) && destination.imageUrls.length > 0
+                                                                    ? destination.imageUrls[0]
+                                                                    : "/travel4K.jpg"
+                                                        }
+                                                        alt={destination.name}
+                                                        width={500}
+                                                        height={300}
+                                                        className="mt-4 rounded-lg"
+                                                    />
+                                                    {/* )} */}
+
+                                                </Link>
                                             </div>
 
                                             {/* Events & Cultural Aspects */}
-                                            <div className="w-1/2 mb-6 p-4 border rounded-lg shadow-md dark:border-strokedark">
+                                            < div className="w-1/2 mb-6 p-4 border rounded-lg shadow-md dark:border-strokedark" >
                                                 <h3 className="text-xl font-semibold">Events & Cultural Aspects</h3>
 
                                                 {/* Events */}
-                                                <div className="mt-2">
+                                                < div className="mt-2" >
                                                     <h4 className="text-lg font-medium">Events</h4>
-                                                    {destination.events?.length > 0 ? (
-                                                        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
-                                                            {destination.events.map((event, index) => (
-                                                                <li key={index}>{event}</li>
-                                                            ))}
-                                                        </ul>
-                                                    ) : (
-                                                        <p className="text-sm text-gray-600 dark:text-gray-400">No events listed</p>
-                                                    )}
+                                                    {
+                                                        destination.events?.length > 0 ? (
+                                                            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+                                                                {destination.events.map((event, index) => (
+                                                                    <li key={index}>{event}</li>
+                                                                ))}
+                                                            </ul>
+                                                        ) : (
+                                                            <p className="text-sm text-gray-600 dark:text-gray-400">No events listed</p>
+                                                        )
+                                                    }
                                                 </div>
 
                                                 {/* Cultural Aspects */}
@@ -427,15 +366,15 @@ const Cultural: React.FC = () => {
                             ) : (
                                 <p className="text-center text-gray-500">Please search for destinations.</p>
                             )}
-                        </div>
-                    </motion.div>
+                        </div >
+                    </motion.div >
                     {/* <!-- Tab Content End --> */}
 
                     {/* <!-- Tab Content End --> */}
-                </div>
-            </section>
+                </div >
+            </section >
             {/* <!-- ===== About Start ===== --> */}
-            <section className="overflow-hidden pb-20 lg:pb-25 xl:pb-30 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-md m-5">
+            < section className="overflow-hidden pb-20 lg:pb-25 xl:pb-30 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-md m-5" >
                 <div className="mx-auto max-w-c-1235 px-4 md:px-8 xl:px-0">
                     <div className="flex items-center gap-8 lg:gap-32.5">
                         <motion.div
@@ -457,13 +396,13 @@ const Cultural: React.FC = () => {
                             className="animate_left relative mx-auto hidden aspect-[588/526.5] md:block md:w-1/2"
                         >
                             <Image
-                                src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                src="/festival.jpg"
                                 alt="Cultural"
                                 className="dark:hidden"
                                 fill
                             />
                             <Image
-                                src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                src="/festival.jpg"
                                 alt="Cultural"
                                 className="hidden dark:block"
                                 fill
@@ -491,17 +430,16 @@ const Cultural: React.FC = () => {
                                 <span className="mb-4 mr-4 inline-flex rounded-full bg-meta px-4.5 py-1 text-metatitle uppercase text-white ">
                                     New
                                 </span>{" "}
-                                SaaS Boilerplate for Next.js
+                                Explore new events and cultural foods in places
                             </span>
                             <h2 className="relative mb-6 text-3xl font-bold text-black dark:text-white xl:text-hero">
-                                A Complete Solution for
+                                A Complete Solution for&nbsp;
                                 <span className="relative inline-block before:absolute before:bottom-2.5 before:left-0 before:-z-1 before:h-3 before:w-full before:bg-titlebg dark:before:bg-titlebgdark">
-                                    SaaS Startup
+                                    planning travel ideas
                                 </span>
                             </h2>
                             <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
-                                ultricies lacus non fermentum ultrices. Fusce consectetur le.
+                                Stay updated on the latest cultural events and explore destinations that bring traditions to life. Our platform connects you with vibrant festivals, local heritage sites, and must-visit attractions to enrich your travel experience.
                             </p>
 
                             <div className="mt-7.5 flex items-center gap-5">
@@ -512,9 +450,9 @@ const Cultural: React.FC = () => {
                                 </div>
                                 <div className="w-3/4">
                                     <h3 className="mb-0.5 text-metatitle2 text-black dark:text-white">
-                                        React 18, Next.js 13 and TypeScript
+                                        What you can do?
                                     </h3>
-                                    <p>Ut ultricies lacus non fermentum ultrices.</p>
+                                    <p>Discover exciting events and unique cultural experiences! Explore festivals, local traditions, and must-visit destinations—all in one place. Find the perfect spots to immerse yourself in authentic cultural vibes!</p>
                                 </div>
                             </div>
                             <div className="mt-7.5 flex items-center gap-5">
@@ -525,108 +463,16 @@ const Cultural: React.FC = () => {
                                 </div>
                                 <div className="w-3/4">
                                     <h3 className="mb-0.5 text-metatitle2 text-black dark:text-white">
-                                        Fully Customizable
+                                        Enhance your journey
                                     </h3>
-                                    <p>consectetur adipiscing elit fermentum ultricies.</p>
+                                    <p>Uncover cultural gems and upcoming events near you. Plan your journey with ease and dive into unforgettable experiences!</p>
                                 </div>
                             </div>
                         </motion.div>
                     </div>
                 </div>
-            </section>
+            </section >
             {/* <!-- ===== About End ===== --> */}
-
-            {/* <!-- ===== About Two Start ===== --> */}
-            <section>
-                <div className="overflow-hidden p-4 md:px-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md m-5">
-                    <div className="flex items-center gap-8 lg:gap-32.5">
-                        <motion.div
-                            variants={{
-                                hidden: {
-                                    opacity: 0,
-                                    x: -20,
-                                },
-
-                                visible: {
-                                    opacity: 1,
-                                    x: 0,
-                                },
-                            }}
-                            initial="hidden"
-                            whileInView="visible"
-                            transition={{ duration: 1, delay: 0.1 }}
-                            viewport={{ once: true }}
-                            className="animate_left md:w-1/2"
-                        >
-                            <h4 className="font-medium uppercase text-black dark:text-white">
-                                Launch Your SaaS Fast
-                            </h4>
-                            <h2 className="relative mb-6 text-3xl font-bold text-black dark:text-white xl:text-hero">
-                                Packed with All Essential {"   "}
-                                <span className="relative inline-block before:absolute before:bottom-2.5 before:left-0 before:-z-1 before:h-3 before:w-full before:bg-titlebg2 dark:before:bg-titlebgdark">
-                                    Integrations
-                                </span>
-                            </h2>
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
-                                ultricies lacus non fermentum ultrices. Fusce consectetur le.
-                            </p>
-                            <div>
-                                <a
-                                    href="#"
-                                    className="group mt-7.5 inline-flex items-center gap-2.5 text-black hover:text-primary dark:text-white dark:hover:text-primary"
-                                >
-                                    <span className="duration-300 group-hover:pr-2">
-                                        Know More
-                                    </span>
-                                    <svg
-                                        width="14"
-                                        height="14"
-                                        viewBox="0 0 14 14"
-                                        fill="currentColor"
-                                    >
-                                        <path d="M10.4767 6.16701L6.00668 1.69701L7.18501 0.518677L13.6667 7.00034L7.18501 13.482L6.00668 12.3037L10.4767 7.83368H0.333344V6.16701H10.4767Z" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </motion.div>
-                        <motion.div
-                            variants={{
-                                hidden: {
-                                    opacity: 0,
-                                    x: 20,
-                                },
-
-                                visible: {
-                                    opacity: 1,
-                                    x: 0,
-                                },
-                            }}
-                            initial="hidden"
-                            whileInView="visible"
-                            transition={{ duration: 1, delay: 0.1 }}
-                            viewport={{ once: true }}
-                            className="animate_right relative mx-auto hidden aspect-[588/526.5] md:block md:w-1/2"
-                        >
-                            <Image
-                                src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                alt="Cultural2"
-                                className="dark:hidden rounded-xl"
-                                fill
-                            />
-                            <Image
-                                src="./images/about/about-dark-02.svg"
-                                alt="About"
-                                className="hidden dark:block rounded-xl"
-                                fill
-                            />
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-            {/* <!-- ===== About Two End ===== --> */}
-
-
         </>
     );
 };
