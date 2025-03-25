@@ -53,8 +53,6 @@ interface PageProps {
 }
 
 const DestinationDetail = () => {
-  // const router = useRouter();
-  // const { id } = router.query;
   const { id } = useParams();
   const [destination, setDestination] = useState<Destination | null>(null);
   const [recommendedDestinations, setRecommendedDestinations] = useState<RecommendedDestination[]>([]);
@@ -77,10 +75,6 @@ const DestinationDetail = () => {
           )
         );
 
-        console.log("allDestinations", allDestinations); // Debugging output
-
-        //   let destinationData = allDestinations.find(dest => dest.destinationId === id);
-        // console.log("cache", destinationData);
         let destinationData: Destination | null = allDestinations.find(dest => dest.destinationId === id) || null;
 
         console.log("datane", destinationData)
@@ -97,22 +91,6 @@ const DestinationDetail = () => {
 
         console.log("datane 3", destinationData)
         setDestination(destinationData);
-
-        // const cachedDestination = allDestinations.find(dest => dest.destinationId === id);
-
-        // console.log("cache", cachedDestination);
-
-        // if (cachedDestination) {
-        //   setDestination(cachedDestination);
-        //   // setLoading(false);
-        //   // return;
-        // }else{
-        // Fetch destination details
-        // const response = await getDestinationById(destinationId);
-        // if (!response || !response.data) {
-        //   throw new Error("Failed to fetch destination");
-        // }
-        // setDestination(response.data);
 
         let categoryName = "";
         if (destinationData?.categoryId) {
@@ -140,10 +118,7 @@ const DestinationDetail = () => {
 
           const searchData = promptParts.join(" ") + ".";
           const recResponse = await getRecommendation(searchData);
-          // if (!recResponse.ok) {
-          //   throw new Error("Failed to fetch recommended destinations");
-          // }
-          // const recData = await recResponse.json();
+
           setRecommendedDestinations(recResponse.data.response);
           await saveData(recResponse.data.response)
         }
@@ -159,15 +134,15 @@ const DestinationDetail = () => {
   }, [id]);
 
   if (!id) {
-    return <div className="flex justify-center items-center h-96">Destination ID is required</div>;
+    return <div className="flex justify-center items-center h-screen">Destination ID is required</div>;
   }
 
   if (loading) {
-    return <div className="flex justify-center items-center h-96">Loading...</div>;
+    return <div className="flex justify-center items-center bg-white h-screen"> <span className="loading loading-dots w-20 h-20"></span></div>;
   }
 
   if (error) {
-    return <div className="flex justify-center items-center h-96 text-red-500">{error}</div>;
+    return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
   }
 
   if (!destination) {
