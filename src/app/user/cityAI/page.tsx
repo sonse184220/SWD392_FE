@@ -9,6 +9,7 @@ import "swiper/css";
 import "swiper/css/effect-fade";
 import { useAuth } from "@/hooks/useAuth";
 import { notFound } from "next/navigation";
+import Unauthorized from "@/app/reusePages/unauthorized";
 export default function CityPage() {
   const [selectedCity, setSelectedCity] = useState<string>("");
   const { isAuthenticated, user, token } = useAuth();
@@ -22,7 +23,8 @@ export default function CityPage() {
 
   if (!isAuthenticated && user?.role !== "User") {
     // router.push("/");
-    return notFound();
+    return <Unauthorized />;
+    // return notFound();
   }
 
   return (
