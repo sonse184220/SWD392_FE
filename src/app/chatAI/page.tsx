@@ -39,8 +39,8 @@ function AiChat() {
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const USER_AVATAR = "tourists.jpg"; 
-  const AI_AVATAR = "cityscoutlogo.jpg";
+  const USER_AVATAR = "/tourists.jpg"; // Đường dẫn tương đối từ thư mục public
+  const AI_AVATAR = "/cityscoutlogo.jpg"; // Đường dẫn tương đối từ thư mục public
 
   useEffect(() => {
     async function fetchMessages() {
@@ -59,12 +59,9 @@ function AiChat() {
     fetchMessages();
   }, []);
 
-  // Updated formatMessage to handle **bold** formatting
   const formatMessage = (message: string) => {
-    // Split the message by newlines
     const lines = message.split("\n");
     return lines.map((line, index) => {
-      // Handle **bold** formatting within each line
       const parts = line.split(/(\*\*[^*]+\*\*)/g); // Split by **text**
       const formattedLine = parts.map((part, partIndex) => {
         if (part.startsWith("**") && part.endsWith("**")) {
