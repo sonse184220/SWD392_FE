@@ -304,11 +304,11 @@ const DestinationRecommendPage = () => {
                                 </FormGroup>
                             </div>
 
-                            <label className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1">
+                            {/* <label className="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1">
                                 Select Subcategories
-                            </label>
+                            </label> */}
                             {/* SubCategory Selection (Checkbox) */}
-                            <div className="mb-4 max-h-90 overflow-y-auto">
+                            {/* <div className="mb-4 max-h-90 overflow-y-auto">
 
                                 <FormGroup>
                                     {filteredSubCategories.map((subCategory) => (
@@ -324,7 +324,7 @@ const DestinationRecommendPage = () => {
                                         />
                                     ))}
                                 </FormGroup>
-                            </div>
+                            </div> */}
 
                             {/* Search Button */}
                             <Button variant="contained" color="primary" fullWidth onClick={handleSearch} disabled={!selectedCity}>
