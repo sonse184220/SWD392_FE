@@ -133,23 +133,26 @@ export default function Profile() {
             <form className='w-3/4'>
                 <div className="space-y-12">
                     <div className="border-b border-gray-900/10 pb-12">
-                        <div className="flex">
-                            <div className="flex flex-col m-1 w-1/4">
-                                <h2 className="text-base/7 font-semibold text-gray-900">Personal Information</h2>
+                        <div className="flex justify-center">
+                            <div className="flex flex-col items-center m-1 w-1/4 text-center">
+                                <h1 className="text-2xl font-extrabold text-gray-900">Personal Information</h1>
                                 <p className="mt-1 text-sm/6 text-gray-600">Update your information here.</p>
-                            </div>
-                            <div className="mt-3 flex justify-center items-center w-3/4">
-                                <img
-                                    src={userInfo.profilePicture}
-                                    alt="Profile"
-                                    className="w-24 h-24 rounded-full border-2 border-gray-300 shadow-md object-cover"
-                                />
                             </div>
                         </div>
 
-                        <div className="flex gap-4">
-                            <Dialog open={isOpenUserInfo} onOpenChange={setIsOpenUserInfo}>
-                                <DialogTrigger asChild>
+
+                        <div className="flex justify-between">
+                            
+                            <div className="items-center">
+                                <p className="flex justify-center ml-35 underline">Profile Picture</p>
+                                <img
+                                    src={userInfo.profilePicture}
+                                    alt="Profile"
+                                    className="w-27 h-27 rounded-full border-2 border-gray-300 shadow-md object-cover ml-35"
+                                />
+                            </div>
+                            <Dialog open={isOpenUserInfo} onOpenChange={setIsOpenUserInfo} >
+                                <DialogTrigger asChild className="mt-25">
                                     <Button>Edit Profile</Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-h-[90vh] overflow-y-auto">
