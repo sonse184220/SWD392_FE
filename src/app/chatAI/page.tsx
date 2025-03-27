@@ -13,7 +13,6 @@ import { axiosInstance } from "../../../axiosInstance";
 import { IoIosAttach } from "react-icons/io";
 import { getMessageChat } from "@/services/AI/getMessagesChat";
 
-// API function for sending messages to the backend
 async function sendMessage(messageContent: string) {
   try {
     const response = await axiosInstance.post("/cityscout/ai/send-message", { message: messageContent });
@@ -26,7 +25,7 @@ async function sendMessage(messageContent: string) {
 
 interface Message {
   id: string;
-  content: string | JSX.Element[]; // Hỗ trợ cả chuỗi và mảng JSX
+  content: string | JSX.Element[];
   role: "user" | "assistant";
   experimental_attachments?: Attachment[];
 }
@@ -39,8 +38,8 @@ function AiChat() {
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const USER_AVATAR = "/tourists.jpg"; // Đường dẫn tương đối từ thư mục public
-  const AI_AVATAR = "/cityscoutlogo.jpg"; // Đường dẫn tương đối từ thư mục public
+  const USER_AVATAR = "/tourists.jpg"; 
+  const AI_AVATAR = "/cityscoutlogo.jpg"; 
 
   useEffect(() => {
     async function fetchMessages() {
@@ -53,7 +52,6 @@ function AiChat() {
         const fetchedMessages = messagePairs.reverse().flat();
         setMessages(fetchedMessages);
       } catch (error) {
-        console.error("Lỗi khi lấy tin nhắn:", error);
       }
     }
     fetchMessages();
@@ -62,10 +60,9 @@ function AiChat() {
   const formatMessage = (message: string) => {
     const lines = message.split("\n");
     return lines.map((line, index) => {
-      const parts = line.split(/(\*\*[^*]+\*\*)/g); // Split by **text**
+      const parts = line.split(/(\*\*[^*]+\*\*)/g); 
       const formattedLine = parts.map((part, partIndex) => {
         if (part.startsWith("**") && part.endsWith("**")) {
-          // Remove the ** markers and wrap the content in <strong>
           const boldText = part.slice(2, -2);
           return <strong key={partIndex}>{boldText}</strong>;
         }
@@ -89,6 +86,7 @@ function AiChat() {
       const messageContent = input;
       setInput("");
   
+      // Thêm tin nhắn người dùng
       const userMessage: Message = {
         id: Date.now().toString(),
         content: formatMessage(messageContent),
@@ -98,6 +96,14 @@ function AiChat() {
       setMessages((prev) => [...prev, userMessage]);
       setAttachment(null);
   
+      // Cuộn xuống ngay sau khi thêm tin nhắn người dùng
+      if (chatContainerRef.current) {
+        requestAnimationFrame(() => {
+          chatContainerRef.current!.scrollTop = chatContainerRef.current!.scrollHeight;
+        });
+      }
+  
+      // Gửi tin nhắn và nhận phản hồi từ bot
       const response = await sendMessage(messageContent);
       const assistantContent = response.data.response || response.data.message || "No response received";
   
@@ -108,8 +114,11 @@ function AiChat() {
       };
       setMessages((prev) => [...prev, assistantMessage]);
   
+      // Cuộn xuống lần nữa sau khi thêm tin nhắn bot
       if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        requestAnimationFrame(() => {
+          chatContainerRef.current!.scrollTop = chatContainerRef.current!.scrollHeight;
+        });
       }
     } catch (error) {
       console.error("Failed to send message:", error);
@@ -119,6 +128,12 @@ function AiChat() {
         role: "assistant",
       };
       setMessages((prev) => [...prev, errorMessage]);
+  
+      if (chatContainerRef.current) {
+        requestAnimationFrame(() => {
+          chatContainerRef.current!.scrollTop = chatContainerRef.current!.scrollHeight;
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +163,6 @@ function AiChat() {
         chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
       }
     } catch (error) {
-      console.error("Failed to handle suggestion:", error);
       setMessages((prev) => [
         ...prev,
         { 
