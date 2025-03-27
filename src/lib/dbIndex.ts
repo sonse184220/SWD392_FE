@@ -2,7 +2,7 @@ import { openDB, deleteDB } from 'idb';
 
 const DB_NAME = 'CityScoutDB';
 const STORE_NAME = 'recommendations';
-const EXPIRATION_TIME = 10 * 60 * 1000; // 10 phút
+const EXPIRATION_TIME = 30 * 60 * 1000; // 30 phút
 const EXPIRATION_KEY = 'db_expiration'; // Key to track expiration in localStorage
 
 export const initDB = async () => {
