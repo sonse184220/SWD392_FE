@@ -335,32 +335,88 @@ const Destination = () => {
                 </TableBody>
             </Table>
             <div className="flex justify-center mt-4">
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious href="#" onClick={() => handlePageChange(currentPage - 1)} />
-                        </PaginationItem>
+    <Pagination>
+        <PaginationContent>
+            {/* Nút Previous */}
+            <PaginationItem>
+                <PaginationPrevious 
+                    href="#" 
+                    onClick={() => handlePageChange(currentPage - 1)} 
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                />
+            </PaginationItem>
 
-                        {Array.from({ length: totalPages }, (_, index) => (
-                            <PaginationItem key={index}>
-                                <PaginationLink
-                                    href="#"
-                                    isActive={index + 1 === currentPage}
-                                    onClick={() => handlePageChange(index + 1)}
-                                >
-                                    {index + 1}
-                                </PaginationLink>
-                            </PaginationItem>
-                        ))}
+            {/* Trang đầu tiên */}
+            <PaginationItem>
+                <PaginationLink
+                    href="#"
+                    isActive={currentPage === 1}
+                    onClick={() => handlePageChange(1)}
+                >
+                    1
+                </PaginationLink>
+            </PaginationItem>
 
-                        {totalPages > 3 && <PaginationEllipsis />}
+            {/* Hiển thị dấu "..." nếu trang hiện tại cách trang đầu > 2 */}
+            {currentPage > 4 && totalPages > 5 && (
+                <PaginationItem>
+                    <PaginationEllipsis />
+                </PaginationItem>
+            )}
 
-                        <PaginationItem>
-                            <PaginationNext href="#" onClick={() => handlePageChange(currentPage + 1)} />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            </div>
+            {/* Các trang xung quanh trang hiện tại */}
+            {Array.from({ length: totalPages }, (_, index) => index + 1)
+                .filter(page => {
+                    // Chỉ hiển thị các trang gần trang hiện tại (trừ trang đầu và cuối)
+                    return (
+                        page > 1 && 
+                        page < totalPages && 
+                        Math.abs(page - currentPage) <= 1
+                    );
+                })
+                .map(page => (
+                    <PaginationItem key={page}>
+                        <PaginationLink
+                            href="#"
+                            isActive={page === currentPage}
+                            onClick={() => handlePageChange(page)}
+                        >
+                            {page}
+                        </PaginationLink>
+                    </PaginationItem>
+                ))}
+
+            {/* Hiển thị dấu "..." nếu trang hiện tại cách trang cuối > 2 */}
+            {currentPage < totalPages - 2 && totalPages > 3 && (
+                <PaginationItem>
+                    <PaginationEllipsis />
+                </PaginationItem>
+            )}
+
+            {/* Trang cuối cùng (nếu totalPages > 1) */}
+            {totalPages > 1 && (
+                <PaginationItem>
+                    <PaginationLink
+                        href="#"
+                        isActive={currentPage === totalPages}
+                        onClick={() => handlePageChange(totalPages)}
+                    >
+                        {totalPages}
+                    </PaginationLink>
+                </PaginationItem>
+            )}
+
+            {/* Nút Next */}
+            <PaginationItem>
+                <PaginationNext 
+                    href="#" 
+                    onClick={() => handlePageChange(currentPage + 1)} 
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                />
+            </PaginationItem>
+        </PaginationContent>
+    </Pagination>
+</div>
 
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogContent className="max-h-100 overflow-y-auto">

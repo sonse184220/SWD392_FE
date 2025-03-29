@@ -189,9 +189,9 @@ const Cultural: React.FC = () => {
 
     return (
         <>
-            <section className="relative pb-20 pt-18.5 overflow-hidde lg:pb-25 xl:pb-30 bg-white dark:bg-gray-900  p-6 rounded-xl shadow-md m-5">
-                <div className="relative mx-auto max-w-c-1390 px-4 md:px-8 2xl:px-0">
-                    <div className="absolute -top-16 -z-1 mx-auto h-[350px] w-[90%]">
+            <section className="relative pb-20 pt-18.5 overflow-hidden lg:pb-25 xl:pb-30 bg-white dark:bg-gray-900  p-6 rounded-xl shadow-md m-5">
+                <div className="relative mx-auto max-w-c-1390 px-4 md:px-6 2xl:px-0">
+                    <div className="absolute -top-16 -z-1 mx-auto h-[300px] w-[95%]">
                         <Image
                             fill
                             className="dark:hidden"
@@ -384,7 +384,7 @@ const Cultural: React.FC = () => {
                 </div >
             </section >
             {/* <!-- ===== About Start ===== --> */}
-            < section className="overflow-hidden pb-20 lg:pb-25 xl:pb-30 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-md m-5" >
+            < section className="overflow-hidden ml-10" >
                 <div className="mx-auto max-w-c-1235 px-4 md:px-8 xl:px-0">
                     <div className="flex items-center gap-8 lg:gap-32.5">
                         <motion.div
