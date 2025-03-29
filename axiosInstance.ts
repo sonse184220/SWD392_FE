@@ -1,10 +1,10 @@
 import axios from "axios";
 
 export const axiosInstance = axios.create({
-    baseURL: 'http://localhost:5028/',
+    // baseURL: 'http://localhost:5028/',
     // baseURL: 'https://cityscout.azurewebsites.net/',
     // baseURL: 'http://cityscouttravel.somee.com/',
-    // baseURL: 'https://www.cityscouttravel.somee.com/',
+    baseURL: 'https://www.cityscouttravel.somee.com/',
 });
 // import axios from "axios";
 
