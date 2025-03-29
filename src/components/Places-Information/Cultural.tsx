@@ -8,6 +8,8 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { saveData } from "@/lib/dbIndex";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import Unauthorized from "@/app/reusePages/unauthorized";
 
 
 type CulturalData = {
@@ -46,6 +48,8 @@ interface District {
 }
 
 const Cultural: React.FC = () => {
+    const { isAuthenticated, user, token } = useAuth();
+
     const [data, setData] = useState<CulturalData | null>(null);
     const [currentTab, setCurrentTab] = useState("tabOne");
     const [destinationList, setDestinationList] = useState<Destination[]>([]);
@@ -148,7 +152,8 @@ const Cultural: React.FC = () => {
             const cityName = selectedCity.name;
             const districtName = selectedDistrict?.name || "all districts";
             const prompt = `List 3 places with related events and cultural to visit in ${cityName}, ${districtName}.`;
-            const response = await getRecommendation(prompt);
+            const safeToken = token ?? "";
+            const response = await getRecommendation(safeToken, prompt);
             console.log("ne" + Date.now.toString + response)
 
             if (response.status === 200 && response.data.response) {
@@ -176,6 +181,11 @@ const Cultural: React.FC = () => {
             setIsLoading(false);
         }
     };
+
+    if (!isAuthenticated && user?.role !== "User") {
+        // router.push("/");
+        return <Unauthorized />;
+    }
 
     return (
         <>

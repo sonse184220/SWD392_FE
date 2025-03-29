@@ -11,6 +11,8 @@ import { motion } from "framer-motion";
 
 import { getData, saveData } from '@/lib/dbIndex';
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import Unauthorized from "@/app/reusePages/unauthorized";
 
 // Define types
 type Destination = {
@@ -53,6 +55,8 @@ interface PageProps {
 }
 
 const DestinationDetail = () => {
+  const { isAuthenticated, user, token } = useAuth();
+
   const { id } = useParams();
   const [destination, setDestination] = useState<Destination | null>(null);
   const [recommendedDestinations, setRecommendedDestinations] = useState<RecommendedDestination[]>([]);
@@ -117,7 +121,8 @@ const DestinationDetail = () => {
           }
 
           const searchData = promptParts.join(" ") + ".";
-          const recResponse = await getRecommendation(searchData);
+          const safeToken = token ?? "";
+          const recResponse = await getRecommendation(safeToken, searchData);
 
           setRecommendedDestinations(recResponse.data.response);
           await saveData(recResponse.data.response)
@@ -135,6 +140,11 @@ const DestinationDetail = () => {
 
   if (!id) {
     return <div className="flex justify-center items-center h-screen">Destination ID is required</div>;
+  }
+
+  if (!isAuthenticated && user?.role !== "User") {
+    // router.push("/");
+    return <Unauthorized />;
   }
 
   if (loading) {
