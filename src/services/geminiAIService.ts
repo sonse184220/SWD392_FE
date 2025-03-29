@@ -14,11 +14,16 @@ export async function sendMessage(requestMessage: string): Promise<AxiosResponse
     }
 }
 
-export async function getRecommendation(requestMessage: string): Promise<AxiosResponse> {
+export async function getRecommendation(token: string, requestMessage: string): Promise<AxiosResponse> {
     try {
         const response = await axiosInstance.post(
             "/cityscout/ai/get-recommendation",
-            { message: requestMessage }
+            { message: requestMessage },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
         );
         return response;
     } catch (error) {

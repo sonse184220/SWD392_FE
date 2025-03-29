@@ -8,6 +8,8 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { saveData } from "@/lib/dbIndex";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import Unauthorized from "@/app/reusePages/unauthorized";
 
 
 type CulturalData = {
@@ -46,6 +48,8 @@ interface District {
 }
 
 const Cultural: React.FC = () => {
+    const { isAuthenticated, user, token } = useAuth();
+
     const [data, setData] = useState<CulturalData | null>(null);
     const [currentTab, setCurrentTab] = useState("tabOne");
     const [destinationList, setDestinationList] = useState<Destination[]>([]);
@@ -148,7 +152,8 @@ const Cultural: React.FC = () => {
             const cityName = selectedCity.name;
             const districtName = selectedDistrict?.name || "all districts";
             const prompt = `List 3 places with related events and cultural to visit in ${cityName}, ${districtName}.`;
-            const response = await getRecommendation(prompt);
+            const safeToken = token ?? "";
+            const response = await getRecommendation(safeToken, prompt);
             console.log("ne" + Date.now.toString + response)
 
             if (response.status === 200 && response.data.response) {
@@ -177,11 +182,16 @@ const Cultural: React.FC = () => {
         }
     };
 
+    if (!isAuthenticated && user?.role !== "User") {
+        // router.push("/");
+        return <Unauthorized />;
+    }
+
     return (
         <>
-            <section className="relative pb-20 pt-18.5 overflow-hidde lg:pb-25 xl:pb-30 bg-white dark:bg-gray-900  p-6 rounded-xl shadow-md m-5">
-                <div className="relative mx-auto max-w-c-1390 px-4 md:px-8 2xl:px-0">
-                    <div className="absolute -top-16 -z-1 mx-auto h-[350px] w-[90%]">
+            <section className="relative pb-20 pt-18.5 overflow-hidden lg:pb-25 xl:pb-30 bg-white dark:bg-gray-900  p-6 rounded-xl shadow-md m-5">
+                <div className="relative mx-auto max-w-c-1390 px-4 md:px-6 2xl:px-0">
+                    <div className="absolute -top-16 -z-1 mx-auto h-[300px] w-[95%]">
                         <Image
                             fill
                             className="dark:hidden"
@@ -374,7 +384,7 @@ const Cultural: React.FC = () => {
                 </div >
             </section >
             {/* <!-- ===== About Start ===== --> */}
-            < section className="overflow-hidden pb-20 lg:pb-25 xl:pb-30 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-md m-5" >
+            < section className="overflow-hidden ml-10" >
                 <div className="mx-auto max-w-c-1235 px-4 md:px-8 xl:px-0">
                     <div className="flex items-center gap-8 lg:gap-32.5">
                         <motion.div
