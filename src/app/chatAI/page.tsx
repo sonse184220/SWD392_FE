@@ -12,10 +12,15 @@ import { MODEL_TO_FRIENDLY_NAME, SUPPORTED_MODELS } from "../../model-helpers";
 import { axiosInstance } from "../../../axiosInstance";
 import { IoIosAttach } from "react-icons/io";
 import { getMessageChat } from "@/services/AI/getMessagesChat";
+import { useAuth } from "@/hooks/useAuth";
 
-async function sendMessage(messageContent: string) {
+async function sendMessage(token: string, messageContent: string) {
   try {
-    const response = await axiosInstance.post("/cityscout/ai/send-message", { message: messageContent });
+    const response = await axiosInstance.post("/cityscout/ai/send-message", { message: messageContent }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     return response;
   } catch (error) {
     console.error("Error sending message:", error);
@@ -31,6 +36,8 @@ interface Message {
 }
 
 function AiChat() {
+  const { isAuthenticated, user, token } = useAuth();
+
   const [model, setModel] = useState<SUPPORTED_MODELS>("gpt-4o-mini");
   const [input, setInput] = useState("");
   const [attachment, setAttachment] = useState<Attachment | null>(null);
@@ -38,13 +45,14 @@ function AiChat() {
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const USER_AVATAR = "/tourists.jpg"; 
-  const AI_AVATAR = "/cityscoutlogo.jpg"; 
+  const USER_AVATAR = "/tourists.jpg";
+  const AI_AVATAR = "/cityscoutlogo.jpg";
 
   useEffect(() => {
     async function fetchMessages() {
       try {
-        const response = await getMessageChat();
+        const safeToken = token ?? "";
+        const response = await getMessageChat(safeToken);
         const messagePairs = response.data.map((msg: { prompt: string; response: string }) => [
           { role: "user", content: formatMessage(msg.prompt), id: Date.now().toString() + Math.random() },
           { role: "assistant", content: formatMessage(msg.response), id: Date.now().toString() + Math.random() },
@@ -60,7 +68,7 @@ function AiChat() {
   const formatMessage = (message: string) => {
     const lines = message.split("\n");
     return lines.map((line, index) => {
-      const parts = line.split(/(\*\*[^*]+\*\*)/g); 
+      const parts = line.split(/(\*\*[^*]+\*\*)/g);
       const formattedLine = parts.map((part, partIndex) => {
         if (part.startsWith("**") && part.endsWith("**")) {
           const boldText = part.slice(2, -2);
@@ -80,12 +88,12 @@ function AiChat() {
 
   async function handleSendMessage() {
     if (!input.trim()) return;
-  
+
     try {
       setIsLoading(true);
       const messageContent = input;
       setInput("");
-  
+
       // Thêm tin nhắn người dùng
       const userMessage: Message = {
         id: Date.now().toString(),
@@ -95,25 +103,26 @@ function AiChat() {
       };
       setMessages((prev) => [...prev, userMessage]);
       setAttachment(null);
-  
+
       // Cuộn xuống ngay sau khi thêm tin nhắn người dùng
       if (chatContainerRef.current) {
         requestAnimationFrame(() => {
           chatContainerRef.current!.scrollTop = chatContainerRef.current!.scrollHeight;
         });
       }
-  
+
       // Gửi tin nhắn và nhận phản hồi từ bot
-      const response = await sendMessage(messageContent);
+      const safeToken = token ?? "";
+      const response = await sendMessage(safeToken, messageContent);
       const assistantContent = response.data.response || response.data.message || "No response received";
-  
+
       const assistantMessage: Message = {
         id: Date.now().toString(),
         content: formatMessage(assistantContent),
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
-  
+
       // Cuộn xuống lần nữa sau khi thêm tin nhắn bot
       if (chatContainerRef.current) {
         requestAnimationFrame(() => {
@@ -128,7 +137,7 @@ function AiChat() {
         role: "assistant",
       };
       setMessages((prev) => [...prev, errorMessage]);
-  
+
       if (chatContainerRef.current) {
         requestAnimationFrame(() => {
           chatContainerRef.current!.scrollTop = chatContainerRef.current!.scrollHeight;
@@ -142,33 +151,34 @@ function AiChat() {
   async function handleSuggestionClick(content: string) {
     try {
       setIsLoading(true);
-      const userMessage: Message = { 
-        id: Date.now().toString(), 
+      const userMessage: Message = {
+        id: Date.now().toString(),
         content: formatMessage(content),
-        role: "user" 
+        role: "user"
       };
       setMessages((prev) => [...prev, userMessage]);
-  
-      const response = await sendMessage(content);
+
+      const safeToken = token ?? "";
+      const response = await sendMessage(safeToken, content);
       const assistantContent = response.data.response || response.data.message || "No response received";
-  
+
       const assistantMessage: Message = {
         id: Date.now().toString(),
         content: formatMessage(assistantContent),
         role: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
-  
+
       if (chatContainerRef.current) {
         chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
       }
     } catch (error) {
       setMessages((prev) => [
         ...prev,
-        { 
-          id: Date.now().toString(), 
-          content: formatMessage("Error processing suggestion."), 
-          role: "assistant" 
+        {
+          id: Date.now().toString(),
+          content: formatMessage("Error processing suggestion."),
+          role: "assistant"
         },
       ]);
     } finally {
