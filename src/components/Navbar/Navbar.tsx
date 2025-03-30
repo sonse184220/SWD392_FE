@@ -50,13 +50,13 @@ const Navbar: React.FC<Props> = ({ isLogin }) => {
             <>
                 {/* LOGO */}
                 <div className="flex flex-shrink-0 ml-10 items-center">
-                <Link href="/">
-                    <img
-                        className="hidden h-25 w-35 lg:block"
-                        src="/cityscoutlogo.jpg"
-                        alt="dsign-logo"
-                    />
-                </Link>
+                    <Link href="/">
+                        <img
+                            className="hidden h-25 w-35 lg:block"
+                            src="/cityscoutlogo.jpg"
+                            alt="dsign-logo"
+                        />
+                    </Link>
                 </div>
                 <div className="mx-auto max-w-screen-xl px-8 py-6 lg:px-12 lg:py-6">
                     <div className="relative flex h-20 items-center justify-between">
@@ -70,7 +70,7 @@ const Navbar: React.FC<Props> = ({ isLogin }) => {
                                             href={item.href}
                                             onClick={() => setActiveItem(item.name)} // Thêm onClick handler
                                             className={classNames(
-                                                activeItem === item.name 
+                                                activeItem === item.name
                                                     ? 'text-black border-b-2 border-black' // Style khi active
                                                     : 'hover:text-black hover:border-b-2 hover:border-gray-300', // Style khi hover
                                                 'text-lg font-normal space-links'
@@ -86,10 +86,10 @@ const Navbar: React.FC<Props> = ({ isLogin }) => {
 
                         {/* DRAWER ICON */}
                         <div className="block lg:hidden">
-                            <Bars3Icon 
-                                className="block h-8 w-8" 
-                                aria-hidden="true" 
-                                onClick={() => setIsOpen(true)} 
+                            <Bars3Icon
+                                className="block h-8 w-8"
+                                aria-hidden="true"
+                                onClick={() => setIsOpen(true)}
                             />
                         </div>
 
@@ -127,6 +127,16 @@ const Navbar: React.FC<Props> = ({ isLogin }) => {
                                                 className={`block px-4 py-2 text-sm text-gray-700 ${active ? 'bg-gray-100 text-gray-900' : ''}`}
                                             >
                                                 Account settings
+                                            </a>
+                                        )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <a
+                                                href="/user/history"
+                                                className={`block px-4 py-2 text-sm text-gray-700 ${active ? 'bg-gray-100 text-gray-900' : ''}`}
+                                            >
+                                                History
                                             </a>
                                         )}
                                     </Menu.Item>
