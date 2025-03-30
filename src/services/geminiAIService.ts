@@ -31,3 +31,20 @@ export async function getRecommendation(token: string, requestMessage: string): 
         throw error;
     }
 }
+
+export async function getRecommendationList(token: string): Promise<AxiosResponse> {
+    try {
+        const response = await axiosInstance.get(
+            "/cityscout/ai/get-messages-recommendation",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        return response;
+    } catch (error) {
+        console.error("Error getting recommendation:", error);
+        throw error;
+    }
+}
