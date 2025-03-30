@@ -71,7 +71,8 @@ const DestinationDetail = () => {
 
       try {
         setLoading(true);
-        const storedData = await getData();
+        const safeToken = token ?? "";
+        const storedData = await getData(safeToken);
         console.log("stored", storedData)
         const allDestinations = storedData.flatMap(item =>
           Object.values(item).filter((dest): dest is Destination =>
@@ -121,11 +122,11 @@ const DestinationDetail = () => {
           }
 
           const searchData = promptParts.join(" ") + ".";
-          const safeToken = token ?? "";
+
           const recResponse = await getRecommendation(safeToken, searchData);
 
           setRecommendedDestinations(recResponse.data.response);
-          await saveData(recResponse.data.response)
+          await saveData(recResponse.data.response, safeToken)
         }
       } catch (err) {
         console.error("Error fetching data:", err);

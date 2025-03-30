@@ -173,7 +173,7 @@ const Cultural: React.FC = () => {
                     }))
                 );
 
-                await saveData(response.data.response);
+                await saveData(response.data.response, safeToken);
             }
         } catch (error) {
             console.error("Error fetching destinations:", error);
