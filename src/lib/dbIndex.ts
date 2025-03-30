@@ -103,11 +103,11 @@ export const getData = async (token: string) => {
     const allData = await db.getAll(STORE_NAME);
 
     // If no data found, try to sync from server
-    if (allData.length === 0) {
-        await syncDataFromServer(token);
-        // Fetch again after sync
-        return await db.getAll(STORE_NAME);
-    }
+    // if (allData.length === 0) {
+    await syncDataFromServer(token);
+    // Fetch again after sync
+    return await db.getAll(STORE_NAME);
+    // }
 
     const now = Date.now();
     const validData = allData.filter((item: any) => now - item.createdAt < EXPIRATION_TIME);
